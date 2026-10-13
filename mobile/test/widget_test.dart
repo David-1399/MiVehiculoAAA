@@ -1,30 +1,28 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mivehiculoaaa/main.dart';
+import 'package:mivehiculoaaa/app/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('La aplicacion inicia en Splash y navega al Login', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MiVehiculoAAAApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verifica la pantalla Splash.
+    expect(find.text('MiVehiculoAAA'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(find.text('Control y mantenimiento de tu vehículo'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Completa el temporizador de 2 segundos del Splash.
+    await tester.pump(const Duration(seconds: 2));
+
+    // Permite que GoRouter termine la navegación.
+    await tester.pumpAndSettle();
+
+    // Verifica que llegamos correctamente al Login.
+    expect(find.text('Bienvenido'), findsOneWidget);
+
+    expect(find.text('Iniciar sesión'), findsOneWidget);
+
+    expect(find.text('¿Olvidaste tu contraseña?'), findsOneWidget);
   });
 }
