@@ -1,3 +1,7 @@
+using MiVehiculoAAA.Application.Features.Alertas;
+using MiVehiculoAAA.Application.Features.ProximosMantenimientos;
+using MiVehiculoAAA.Infrastructure.Alertas;
+using MiVehiculoAAA.Infrastructure.ProximosMantenimientos;
 using MiVehiculoAAA.Application.Features.Documentos;
 using MiVehiculoAAA.Application.Features.Gastos;
 using MiVehiculoAAA.Application.Features.Kilometrajes;
@@ -93,6 +97,8 @@ builder.Services.AddScoped<IKilometrajeService, KilometrajeService>();
 builder.Services.AddScoped<IMantenimientoService, MantenimientoService>();
 builder.Services.AddScoped<IDocumentoService, DocumentoService>();
 builder.Services.AddScoped<IGastoService, GastoService>();
+builder.Services.AddScoped<IAlertaService, AlertaService>();
+builder.Services.AddScoped<IProximoMantenimientoService, ProximoMantenimientoService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
