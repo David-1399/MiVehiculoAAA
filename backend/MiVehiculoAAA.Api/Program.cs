@@ -5,8 +5,12 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MiVehiculoAAA.Application.Common.Settings;
 using MiVehiculoAAA.Application.Features.Auth;
+using MiVehiculoAAA.Application.Features.Catalogos;
+using MiVehiculoAAA.Application.Features.Vehiculos;
 using MiVehiculoAAA.Infrastructure.Auth;
+using MiVehiculoAAA.Infrastructure.Catalogos;
 using MiVehiculoAAA.Infrastructure.Data;
+using MiVehiculoAAA.Infrastructure.Vehiculos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +79,8 @@ builder.Services
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICatalogoService, CatalogoService>();
+builder.Services.AddScoped<IVehiculoService, VehiculoService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
