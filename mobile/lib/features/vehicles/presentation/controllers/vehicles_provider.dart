@@ -1,6 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/repositories/in_memory_vehicle_repository.dart';
 import '../../domain/entities/vehicle.dart';
+import '../../domain/repositories/vehicle_repository.dart';
+
+final vehicleRepositoryProvider = Provider<VehicleRepository>((ref) {
+  return InMemoryVehicleRepository();
+});
 
 class VehiclesState {
   const VehiclesState({this.vehicles = const [], this.selectedVehicleId});
@@ -35,9 +41,13 @@ class VehiclesState {
 }
 
 class VehiclesNotifier extends Notifier<VehiclesState> {
+  VehicleRepository get _repository {
+    return ref.read(vehicleRepositoryProvider);
+  }
+
   @override
   VehiclesState build() {
-    return const VehiclesState();
+    return VehiclesState(vehicles: _repository.getAll());
   }
 
   Vehicle addVehicle({
@@ -48,22 +58,69 @@ class VehiclesNotifier extends Notifier<VehiclesState> {
     required String plate,
     required int mileage,
   }) {
+    final normalizedPlate = plate.trim().toUpperCase();
+
+    _validateUniquePlate(normalizedPlate);
+
     final vehicle = Vehicle(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       vehicleTypeId: vehicleTypeId,
       brand: brand.trim(),
       model: model.trim(),
       year: year,
-      plate: plate.trim().toUpperCase(),
+      plate: normalizedPlate,
       mileage: mileage,
     );
 
+    final saved = _repository.add(vehicle);
+
     state = VehiclesState(
-      vehicles: [...state.vehicles, vehicle],
-      selectedVehicleId: vehicle.id,
+      vehicles: _repository.getAll(),
+      selectedVehicleId: saved.id,
     );
 
-    return vehicle;
+    return saved;
+  }
+
+  Vehicle updateVehicle({
+    required String vehicleId,
+    required String vehicleTypeId,
+    required String brand,
+    required String model,
+    required int year,
+    required String plate,
+  }) {
+    final current = _repository.findById(vehicleId);
+
+    if (current == null) {
+      throw StateError('El vehículo que intentas actualizar no existe.');
+    }
+
+    final normalizedPlate = plate.trim().toUpperCase();
+
+    _validateUniquePlate(normalizedPlate, excludingVehicleId: vehicleId);
+
+    final updated = current.copyWith(
+      vehicleTypeId: vehicleTypeId,
+      brand: brand.trim(),
+      model: model.trim(),
+      year: year,
+      plate: normalizedPlate,
+
+      // El kilometraje se conserva. Su modificación debe
+      // hacerse desde el módulo de kilometraje para mantener
+      // consistencia con el historial.
+      mileage: current.mileage,
+    );
+
+    final saved = _repository.update(updated);
+
+    state = VehiclesState(
+      vehicles: _repository.getAll(),
+      selectedVehicleId: saved.id,
+    );
+
+    return saved;
   }
 
   void selectVehicle(String id) {
@@ -71,18 +128,33 @@ class VehiclesNotifier extends Notifier<VehiclesState> {
   }
 
   void updateMileage({required String vehicleId, required int mileage}) {
-    final updatedVehicles = state.vehicles.map((vehicle) {
-      if (vehicle.id != vehicleId) {
-        return vehicle;
-      }
+    final current = _repository.findById(vehicleId);
 
-      return vehicle.copyWith(mileage: mileage);
-    }).toList();
+    if (current == null) {
+      throw StateError('El vehículo no existe.');
+    }
+
+    if (mileage < current.mileage) {
+      throw ArgumentError('El kilometraje no puede ser menor al actual.');
+    }
+
+    _repository.update(current.copyWith(mileage: mileage));
 
     state = VehiclesState(
-      vehicles: updatedVehicles,
+      vehicles: _repository.getAll(),
       selectedVehicleId: state.selectedVehicleId,
     );
+  }
+
+  void _validateUniquePlate(String plate, {String? excludingVehicleId}) {
+    final duplicated = _repository.getAll().any((vehicle) {
+      return vehicle.id != excludingVehicleId &&
+          vehicle.plate.trim().toUpperCase() == plate;
+    });
+
+    if (duplicated) {
+      throw ArgumentError('Ya existe un vehículo registrado con esa placa.');
+    }
   }
 }
 

@@ -60,7 +60,7 @@ class ExpensesPage extends ConsumerWidget {
             onPressed: () {
               context.go(AppRoutes.vehicles);
             },
-            child: const Text('Seleccionar vehÃƒÂ­culo'),
+            child: const Text('Seleccionar vehículo'),
           ),
         ),
       );
@@ -73,7 +73,7 @@ class ExpensesPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Volver al vehÃƒÂ­culo',
+          tooltip: 'Volver al vehículo',
           onPressed: () {
             context.go(AppRoutes.vehicleDetail);
           },
@@ -188,7 +188,7 @@ class ExpensesPage extends ConsumerWidget {
                     ),
                     SizedBox(height: 6),
                     Text(
-                      'Registra los gastos asociados a este vehÃƒÂ­culo.',
+                      'Registra los gastos asociados a este vehículo.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: AppColors.textSecondary),
                     ),

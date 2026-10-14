@@ -69,7 +69,7 @@ class ProfilePage extends ConsumerWidget {
                       children: [
                         _ProfileRow(
                           icon: Icons.mail_outline_rounded,
-                          label: 'Correo electrÃ³nico',
+                          label: 'Correo electrónico',
                           value: session.email,
                         ),
                         const Divider(),
@@ -98,13 +98,13 @@ class ProfilePage extends ConsumerWidget {
                           context.go(AppRoutes.login);
                         },
                   icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Cerrar sesiÃ³n'),
+                  label: const Text('Cerrar sesión'),
                 ),
 
                 const SizedBox(height: 12),
 
                 const Text(
-                  'Los datos completos del perfil se cargarÃ¡n desde la API de usuarios.',
+                  'Los datos completos del perfil se cargarán desde la API de usuarios.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -181,13 +181,13 @@ class _NoSession extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             const Text(
-              'No hay una sesiÃ³n activa.',
+              'No hay una sesión activa.',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onLogin,
-              child: const Text('Iniciar sesiÃ³n'),
+              child: const Text('Iniciar sesión'),
             ),
           ],
         ),

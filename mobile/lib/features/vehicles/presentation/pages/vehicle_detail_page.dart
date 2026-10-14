@@ -13,7 +13,9 @@ class VehicleDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(vehiclesProvider);
+
     final catalogs = ref.watch(catalogsProvider).asData?.value;
+
     final vehicle = state.selectedVehicle;
 
     if (vehicle == null) {
@@ -25,40 +27,38 @@ class VehicleDetailPage extends ConsumerWidget {
             },
             icon: const Icon(Icons.arrow_back_rounded),
           ),
-          title: const Text('Detalle del veh\u00EDculo'),
+          title: const Text('Detalle del vehículo'),
         ),
         body: Center(
           child: FilledButton(
             onPressed: () {
               context.go(AppRoutes.vehicles);
             },
-            child: const Text('Volver a mis veh\u00EDculos'),
+            child: const Text('Volver a mis vehículos'),
           ),
         ),
       );
     }
 
+    final vehicleTypeName =
+        catalogs?.vehicleTypeById(vehicle.vehicleTypeId)?.name ??
+        'Tipo no disponible';
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Volver a mis veh\u00EDculos',
+          tooltip: 'Volver a mis vehículos',
           onPressed: () {
             context.go(AppRoutes.vehicles);
           },
           icon: const Icon(Icons.arrow_back_rounded),
         ),
-        title: const Text('Detalle del veh\u00EDculo'),
+        title: const Text('Detalle del vehículo'),
         actions: [
           IconButton(
-            tooltip: 'Editar veh\u00EDculo',
+            tooltip: 'Editar vehículo',
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'La edici\u00F3n se implementar\u00E1 en el siguiente incremento.',
-                  ),
-                ),
-              );
+              context.push(AppRoutes.vehicleEdit);
             },
             icon: const Icon(Icons.edit_outlined),
           ),
@@ -131,20 +131,13 @@ class VehicleDetailPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _InfoRow(
-                      label: 'Tipo',
-                      value:
-                          catalogs
-                              ?.vehicleTypeById(vehicle.vehicleTypeId)
-                              ?.name ??
-                          'Tipo no disponible',
-                    ),
+                    _InfoRow(label: 'Tipo', value: vehicleTypeName),
                     const Divider(),
                     _InfoRow(label: 'Marca', value: vehicle.brand),
                     const Divider(),
                     _InfoRow(label: 'Modelo', value: vehicle.model),
                     const Divider(),
-                    _InfoRow(label: 'A\u00F1o', value: vehicle.year.toString()),
+                    _InfoRow(label: 'Año', value: vehicle.year.toString()),
                     const Divider(),
                     _InfoRow(
                       label: 'Kilometraje',
@@ -156,14 +149,14 @@ class VehicleDetailPage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Gesti\u00F3n del veh\u00EDculo',
+              'Gestión del vehículo',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
             _ModuleTile(
               icon: Icons.build_outlined,
               title: 'Mantenimientos',
-              subtitle: 'Historial y pr\u00F3ximos servicios',
+              subtitle: 'Historial y próximos servicios',
               onTap: () {
                 context.push(AppRoutes.maintenance);
               },
@@ -181,7 +174,7 @@ class VehicleDetailPage extends ConsumerWidget {
             _ModuleTile(
               icon: Icons.description_outlined,
               title: 'Documentos',
-              subtitle: 'SOAT, tecnomec\u00E1nica y seguros',
+              subtitle: 'SOAT, tecnomecánica y seguros',
               onTap: () {
                 context.push(AppRoutes.documents);
               },
@@ -190,7 +183,7 @@ class VehicleDetailPage extends ConsumerWidget {
             _ModuleTile(
               icon: Icons.payments_outlined,
               title: 'Gastos',
-              subtitle: 'Costos asociados al veh\u00EDculo',
+              subtitle: 'Costos asociados al vehículo',
               onTap: () {
                 context.push(AppRoutes.expenses);
               },
@@ -220,7 +213,14 @@ class _InfoRow extends StatelessWidget {
               style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(width: 16),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
         ],
       ),
     );
@@ -244,19 +244,19 @@ class _ModuleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        onTap: onTap,
         leading: Container(
-          width: 44,
-          height: 44,
+          width: 42,
+          height: 42,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.10),
+            color: AppColors.secondary.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppColors.primary),
+          child: Icon(icon, color: AppColors.secondary),
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(title),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right_rounded),
-        onTap: onTap,
       ),
     );
   }

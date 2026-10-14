@@ -9,6 +9,7 @@ abstract final class AppRoutes {
   static const String vehicles = '/vehicles';
   static const String vehicleRegister = '/vehicles/register';
   static const String vehicleDetail = '/vehicles/detail';
+  static const String vehicleEdit = '/vehicles/edit';
 
   static const String maintenance = '/maintenance';
   static const String maintenanceRegister = '/maintenance/register';

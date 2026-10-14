@@ -16,6 +16,7 @@ import '../../features/mileage/presentation/pages/mileage_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/vehicles/presentation/pages/vehicle_detail_page.dart';
+import '../../features/vehicles/presentation/pages/vehicle_edit_page.dart';
 import '../../features/vehicles/presentation/pages/vehicle_register_page.dart';
 import '../../features/vehicles/presentation/pages/vehicles_page.dart';
 import 'app_routes.dart';
@@ -54,6 +55,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.vehicleDetail,
       builder: (context, state) => const VehicleDetailPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.vehicleEdit,
+      builder: (context, state) => const VehicleEditPage(),
     ),
     GoRoute(
       path: AppRoutes.maintenance,

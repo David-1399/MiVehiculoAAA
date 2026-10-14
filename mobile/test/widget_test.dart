@@ -24,61 +24,37 @@ class FakeAuthRepository implements AuthRepository {
 }
 
 void main() {
-  testWidgets(
-    'La aplicacion inicia en Splash y navega al Login',
-    (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(
-              FakeAuthRepository(),
-            ),
-          ],
-          child: const MiVehiculoAAAApp(),
-        ),
-      );
+  testWidgets('La aplicacion inicia en Splash y navega al Login', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const MiVehiculoAAAApp(),
+      ),
+    );
 
-      // Splash visible inicialmente.
-      expect(
-        find.text('MiVehiculoAAA'),
-        findsOneWidget,
-      );
+    // Splash visible inicialmente.
+    expect(find.text('MiVehiculoAAA'), findsOneWidget);
 
-      expect(
-        find.text(
-          'Control y mantenimiento de tu vehículo',
-        ),
-        findsOneWidget,
-      );
+    expect(find.text('Control y mantenimiento de tu vehículo'), findsOneWidget);
 
-      // Permite que restoreSession() finalice.
-      await tester.pump();
+    // Permite que restoreSession() finalice.
+    await tester.pump();
 
-      // Completa el tiempo mínimo del Splash.
-      await tester.pump(
-        const Duration(seconds: 2),
-      );
+    // Completa el tiempo mínimo del Splash.
+    await tester.pump(const Duration(seconds: 2));
 
-      // Procesa la navegación de GoRouter.
-      await tester.pumpAndSettle();
+    // Procesa la navegación de GoRouter.
+    await tester.pumpAndSettle();
 
-      // Sin sesión restaurada debe ir al Login.
-      expect(
-        find.text('Bienvenido'),
-        findsOneWidget,
-      );
+    // Sin sesión restaurada debe ir al Login.
+    expect(find.text('Bienvenido'), findsOneWidget);
 
-      expect(
-        find.text('Iniciar sesión'),
-        findsOneWidget,
-      );
+    expect(find.text('Iniciar sesión'), findsOneWidget);
 
-      expect(
-        find.text(
-          '¿Olvidaste tu contraseña?',
-        ),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(find.text('¿Olvidaste tu contraseña?'), findsOneWidget);
+  });
 }
