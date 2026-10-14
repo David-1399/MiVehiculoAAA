@@ -19,7 +19,6 @@ class LocalSessionAuthRepository implements AuthRepository {
   Future<UserSession?> restoreSession() async {
     try {
       final email = await _storage.read(key: _emailKey);
-
       final userId = await _storage.read(key: _userIdKey);
 
       if (email == null ||
@@ -30,7 +29,6 @@ class LocalSessionAuthRepository implements AuthRepository {
       }
 
       final displayName = await _storage.read(key: _displayNameKey);
-
       final roleCode = await _storage.read(key: _roleKey);
 
       return UserSession(
@@ -40,8 +38,6 @@ class LocalSessionAuthRepository implements AuthRepository {
         role: UserRoleX.fromCode(roleCode),
       );
     } catch (_) {
-      // Permite que pruebas/widget tests funcionen
-      // incluso cuando el plugin nativo no esta disponible.
       return null;
     }
   }
@@ -61,9 +57,6 @@ class LocalSessionAuthRepository implements AuthRepository {
       throw ArgumentError('La contraseña es obligatoria.');
     }
 
-    // Este adaptador NO valida credenciales.
-    // Solo conserva la sesion ingresada para el prototipo movil.
-    // La validacion real sera responsabilidad de ApiAuthRepository.
     final session = UserSession(
       userId: 'local:$normalizedEmail',
       email: normalizedEmail,
@@ -72,19 +65,33 @@ class LocalSessionAuthRepository implements AuthRepository {
 
     try {
       await _storage.write(key: _userIdKey, value: session.userId);
-
       await _storage.write(key: _emailKey, value: session.email);
-
       await _storage.write(key: _roleKey, value: session.role.code);
-
       await _storage.delete(key: _displayNameKey);
     } catch (_) {
-      // En ejecucion normal Android/iOS el plugin esta disponible.
-      // El estado en memoria sigue siendo valido si el almacenamiento
-      // no esta disponible durante una prueba automatizada.
+      // Compatibilidad con pruebas sin plugin nativo.
     }
 
     return session;
+  }
+
+  @override
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String phone,
+    required String email,
+    required String password,
+  }) async {
+    // Repositorio legado únicamente para compatibilidad.
+    // El flujo real usa ApiAuthRepository.
+    if (email.trim().isEmpty) {
+      throw ArgumentError('El correo es obligatorio.');
+    }
+
+    if (password.isEmpty) {
+      throw ArgumentError('La contraseña es obligatoria.');
+    }
   }
 
   @override
@@ -95,7 +102,7 @@ class LocalSessionAuthRepository implements AuthRepository {
       await _storage.delete(key: _displayNameKey);
       await _storage.delete(key: _roleKey);
     } catch (_) {
-      // Sin datos de sesion sensibles en memoria persistente.
+      // Sin datos sensibles persistentes si el plugin no está disponible.
     }
   }
 }

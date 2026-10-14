@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/network/api_exception.dart';
+import '../controllers/auth_provider.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _firstNameController = TextEditingController();
@@ -35,20 +39,51 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Cuenta creada correctamente. Ahora puedes iniciar sesión.',
-        ),
-      ),
-    );
+    try {
+      await ref
+          .read(authProvider.notifier)
+          .register(
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            phone: _phoneController.text,
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
 
-    context.go(AppRoutes.login);
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Cuenta creada correctamente. Ahora puedes iniciar sesión.',
+          ),
+        ),
+      );
+
+      context.go(AppRoutes.login);
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No fue posible crear la cuenta.')),
+      );
+    }
   }
 
   String? _requiredValidator(String? value, String message) {

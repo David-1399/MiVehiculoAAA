@@ -55,7 +55,7 @@ class _VehicleEditPageState extends ConsumerState<VehicleEditPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -68,7 +68,7 @@ class _VehicleEditPageState extends ConsumerState<VehicleEditPage> {
     }
 
     try {
-      ref
+      await ref
           .read(vehiclesProvider.notifier)
           .updateVehicle(
             vehicleId: vehicleId,
@@ -79,12 +79,20 @@ class _VehicleEditPageState extends ConsumerState<VehicleEditPage> {
             plate: _plateController.text,
           );
 
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vehículo actualizado correctamente.')),
       );
 
       context.go(AppRoutes.vehicleDetail);
     } on ArgumentError catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -94,6 +102,10 @@ class _VehicleEditPageState extends ConsumerState<VehicleEditPage> {
         ),
       );
     } on StateError catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error.message)));
     }

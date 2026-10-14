@@ -5,18 +5,18 @@ class InMemoryVehicleRepository implements VehicleRepository {
   final List<Vehicle> _items = [];
 
   @override
-  List<Vehicle> getAll() {
+  Future<List<Vehicle>> getAll() async {
     return List.unmodifiable(_items);
   }
 
   @override
-  Vehicle add(Vehicle vehicle) {
+  Future<Vehicle> add(Vehicle vehicle) async {
     _items.add(vehicle);
     return vehicle;
   }
 
   @override
-  Vehicle update(Vehicle vehicle) {
+  Future<Vehicle> update(Vehicle vehicle) async {
     final index = _items.indexWhere((item) => item.id == vehicle.id);
 
     if (index < 0) {
@@ -28,7 +28,7 @@ class InMemoryVehicleRepository implements VehicleRepository {
   }
 
   @override
-  Vehicle? findById(String id) {
+  Future<Vehicle?> findById(String id) async {
     for (final vehicle in _items) {
       if (vehicle.id == id) {
         return vehicle;
@@ -39,7 +39,7 @@ class InMemoryVehicleRepository implements VehicleRepository {
   }
 
   @override
-  void deleteById(String id) {
+  Future<void> deleteById(String id) async {
     final before = _items.length;
 
     _items.removeWhere((vehicle) => vehicle.id == id);

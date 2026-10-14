@@ -38,12 +38,12 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    ref
+    await ref
         .read(vehiclesProvider.notifier)
         .addVehicle(
           vehicleTypeId: _vehicleTypeId!,
@@ -53,6 +53,10 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
           plate: _plateController.text,
           mileage: int.parse(_mileageController.text),
         );
+
+    if (!mounted) {
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Vehículo registrado correctamente.')),

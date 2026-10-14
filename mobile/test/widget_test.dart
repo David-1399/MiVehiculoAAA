@@ -20,6 +20,15 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String phone,
+    required String email,
+    required String password,
+  }) async {}
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -36,25 +45,15 @@ void main() {
       ),
     );
 
-    // Splash visible inicialmente.
     expect(find.text('MiVehiculoAAA'), findsOneWidget);
-
     expect(find.text('Control y mantenimiento de tu vehículo'), findsOneWidget);
 
-    // Permite que restoreSession() finalice.
     await tester.pump();
-
-    // Completa el tiempo mínimo del Splash.
     await tester.pump(const Duration(seconds: 2));
-
-    // Procesa la navegación de GoRouter.
     await tester.pumpAndSettle();
 
-    // Sin sesión restaurada debe ir al Login.
     expect(find.text('Bienvenido'), findsOneWidget);
-
     expect(find.text('Iniciar sesión'), findsOneWidget);
-
     expect(find.text('¿Olvidaste tu contraseña?'), findsOneWidget);
   });
 }

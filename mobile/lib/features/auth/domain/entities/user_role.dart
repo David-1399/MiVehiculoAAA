@@ -4,9 +4,9 @@ extension UserRoleX on UserRole {
   String get code {
     switch (this) {
       case UserRole.owner:
-        return 'OWNER';
+        return 'PROPIETARIO';
       case UserRole.administrator:
-        return 'ADMIN';
+        return 'ADMINISTRADOR';
     }
   }
 
@@ -20,10 +20,12 @@ extension UserRoleX on UserRole {
   }
 
   static UserRole fromCode(String? value) {
-    switch (value?.toUpperCase()) {
+    switch (value?.trim().toUpperCase()) {
       case 'ADMIN':
+      case 'ADMINISTRADOR':
         return UserRole.administrator;
       case 'OWNER':
+      case 'PROPIETARIO':
       default:
         return UserRole.owner;
     }

@@ -75,7 +75,9 @@ class VehicleDetailPage extends ConsumerWidget {
               }
 
               try {
-                ref.read(vehiclesProvider.notifier).deleteVehicle(vehicle.id);
+                await ref
+                    .read(vehiclesProvider.notifier)
+                    .deleteVehicle(vehicle.id);
 
                 if (!context.mounted) {
                   return;

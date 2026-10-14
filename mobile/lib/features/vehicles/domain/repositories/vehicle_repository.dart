@@ -1,13 +1,13 @@
 import '../entities/vehicle.dart';
 
 abstract interface class VehicleRepository {
-  List<Vehicle> getAll();
+  Future<List<Vehicle>> getAll();
 
-  Vehicle add(Vehicle vehicle);
+  Future<Vehicle> add(Vehicle vehicle);
 
-  Vehicle update(Vehicle vehicle);
+  Future<Vehicle> update(Vehicle vehicle);
 
-  Vehicle? findById(String id);
+  Future<Vehicle?> findById(String id);
 
-  void deleteById(String id);
+  Future<void> deleteById(String id);
 }
