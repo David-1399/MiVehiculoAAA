@@ -8,4 +8,6 @@ abstract interface class VehicleRepository {
   Vehicle update(Vehicle vehicle);
 
   Vehicle? findById(String id);
+
+  void deleteById(String id);
 }

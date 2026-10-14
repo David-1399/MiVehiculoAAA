@@ -62,6 +62,43 @@ class VehicleDetailPage extends ConsumerWidget {
             },
             icon: const Icon(Icons.edit_outlined),
           ),
+          IconButton(
+            tooltip: 'Eliminar vehículo',
+            onPressed: () async {
+              final confirmed = await _confirmDeleteVehicle(
+                context,
+                vehicle.displayName,
+              );
+
+              if (!confirmed || !context.mounted) {
+                return;
+              }
+
+              try {
+                ref.read(vehiclesProvider.notifier).deleteVehicle(vehicle.id);
+
+                if (!context.mounted) {
+                  return;
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Vehículo eliminado correctamente.'),
+                  ),
+                );
+
+                context.go(AppRoutes.vehicles);
+              } on StateError catch (error) {
+                if (!context.mounted) {
+                  return;
+                }
+
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(error.message)));
+              }
+            },
+            icon: const Icon(Icons.delete_outline_rounded),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -193,6 +230,41 @@ class VehicleDetailPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<bool> _confirmDeleteVehicle(
+  BuildContext context,
+  String vehicleName,
+) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: const Text('Eliminar vehículo'),
+        content: Text(
+          '¿Seguro que deseas eliminar $vehicleName? '
+          'Esta acción quitará el vehículo de tu lista actual.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop(false);
+            },
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop(true);
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return result ?? false;
 }
 
 class _InfoRow extends StatelessWidget {

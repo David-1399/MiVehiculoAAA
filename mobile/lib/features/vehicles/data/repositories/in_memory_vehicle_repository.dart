@@ -37,4 +37,15 @@ class InMemoryVehicleRepository implements VehicleRepository {
 
     return null;
   }
+
+  @override
+  void deleteById(String id) {
+    final before = _items.length;
+
+    _items.removeWhere((vehicle) => vehicle.id == id);
+
+    if (_items.length == before) {
+      throw StateError('El vehículo que intentas eliminar no existe.');
+    }
+  }
 }

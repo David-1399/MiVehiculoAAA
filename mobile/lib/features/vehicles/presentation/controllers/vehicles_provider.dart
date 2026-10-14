@@ -123,6 +123,37 @@ class VehiclesNotifier extends Notifier<VehiclesState> {
     return saved;
   }
 
+  void deleteVehicle(String vehicleId) {
+    final current = _repository.findById(vehicleId);
+
+    if (current == null) {
+      throw StateError('El vehículo que intentas eliminar no existe.');
+    }
+
+    _repository.deleteById(vehicleId);
+
+    final remaining = _repository.getAll();
+
+    String? nextSelectedId;
+
+    if (remaining.isNotEmpty) {
+      final currentSelection = state.selectedVehicleId;
+
+      final selectionStillExists =
+          currentSelection != null &&
+          remaining.any((vehicle) => vehicle.id == currentSelection);
+
+      nextSelectedId = selectionStillExists
+          ? currentSelection
+          : remaining.first.id;
+    }
+
+    state = VehiclesState(
+      vehicles: remaining,
+      selectedVehicleId: nextSelectedId,
+    );
+  }
+
   void selectVehicle(String id) {
     state = state.copyWith(selectedVehicleId: id);
   }
