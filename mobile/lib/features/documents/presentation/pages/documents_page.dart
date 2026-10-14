@@ -191,18 +191,27 @@ class DocumentsPage extends ConsumerWidget {
                                 if (document.evidencePath != null) ...[
                                   const SizedBox(height: 6),
                                   const Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Icon(
-                                        Icons.photo_camera_outlined,
-                                        size: 16,
-                                        color: AppColors.secondary,
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 1),
+                                        child: Icon(
+                                          Icons.photo_camera_outlined,
+                                          size: 16,
+                                          color: AppColors.secondary,
+                                        ),
                                       ),
                                       SizedBox(width: 4),
-                                      Text(
-                                        'Con evidencia fotográfica',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.secondary,
+                                      Flexible(
+                                        child: Text(
+                                          'Con evidencia fotográfica',
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.secondary,
+                                          ),
                                         ),
                                       ),
                                     ],
