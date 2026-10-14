@@ -1,3 +1,11 @@
+using MiVehiculoAAA.Application.Features.Documentos;
+using MiVehiculoAAA.Application.Features.Gastos;
+using MiVehiculoAAA.Application.Features.Kilometrajes;
+using MiVehiculoAAA.Application.Features.Mantenimientos;
+using MiVehiculoAAA.Infrastructure.Documentos;
+using MiVehiculoAAA.Infrastructure.Gastos;
+using MiVehiculoAAA.Infrastructure.Kilometrajes;
+using MiVehiculoAAA.Infrastructure.Mantenimientos;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +89,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+builder.Services.AddScoped<IKilometrajeService, KilometrajeService>();
+builder.Services.AddScoped<IMantenimientoService, MantenimientoService>();
+builder.Services.AddScoped<IDocumentoService, DocumentoService>();
+builder.Services.AddScoped<IGastoService, GastoService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
