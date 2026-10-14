@@ -1,0 +1,27 @@
+﻿# IDE
+.idea/
+
+# Snapshots / backups / scripts temporales
+_snapshot/
+backup-*/
+*.zip
+Crear-Snapshot-MiVehiculoAAA*.ps1
+Fix-Catalogos-MiVehiculoAAA*.ps1
+Refactor-*.ps1
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/build/
+mobile/.idea/
+
+# Android
+mobile/android/.gradle/
+mobile/android/local.properties
+
+# iOS
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/ephemeral/
+
+# Logs
+*.log

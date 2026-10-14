@@ -41,7 +41,7 @@ class VehiclesNotifier extends Notifier<VehiclesState> {
   }
 
   Vehicle addVehicle({
-    required String type,
+    required String vehicleTypeId,
     required String brand,
     required String model,
     required int year,
@@ -50,7 +50,7 @@ class VehiclesNotifier extends Notifier<VehiclesState> {
   }) {
     final vehicle = Vehicle(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
-      type: type.trim(),
+      vehicleTypeId: vehicleTypeId,
       brand: brand.trim(),
       model: model.trim(),
       year: year,
@@ -68,6 +68,21 @@ class VehiclesNotifier extends Notifier<VehiclesState> {
 
   void selectVehicle(String id) {
     state = state.copyWith(selectedVehicleId: id);
+  }
+
+  void updateMileage({required String vehicleId, required int mileage}) {
+    final updatedVehicles = state.vehicles.map((vehicle) {
+      if (vehicle.id != vehicleId) {
+        return vehicle;
+      }
+
+      return vehicle.copyWith(mileage: mileage);
+    }).toList();
+
+    state = VehiclesState(
+      vehicles: updatedVehicles,
+      selectedVehicleId: state.selectedVehicleId,
+    );
   }
 }
 

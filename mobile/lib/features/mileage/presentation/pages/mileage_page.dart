@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
+import '../controllers/mileage_provider.dart';
 
-class MileagePage extends StatefulWidget {
+class MileagePage extends ConsumerStatefulWidget {
   const MileagePage({super.key});
 
   @override
-  State<MileagePage> createState() => _MileagePageState();
+  ConsumerState<MileagePage> createState() {
+    return _MileagePageState();
+  }
 }
 
-class _MileagePageState extends State<MileagePage> {
+class _MileagePageState extends ConsumerState<MileagePage> {
   final _formKey = GlobalKey<FormState>();
+
   final _mileageController = TextEditingController();
 
   @override
@@ -22,7 +28,47 @@ class _MileagePageState extends State<MileagePage> {
     super.dispose();
   }
 
+  String _formatNumber(int value) {
+    final text = value.toString();
+    final result = StringBuffer();
+
+    for (var i = 0; i < text.length; i++) {
+      if (i > 0 && (text.length - i) % 3 == 0) {
+        result.write('.');
+      }
+
+      result.write(text[i]);
+    }
+
+    return result.toString();
+  }
+
+  String _formatDate(DateTime value) {
+    const months = [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
+
+    return '${value.day} ${months[value.month - 1]} ${value.year}';
+  }
+
   void _showRegisterMileageDialog() {
+    final vehicle = ref.read(vehiclesProvider).selectedVehicle;
+
+    if (vehicle == null) {
+      return;
+    }
+
     _mileageController.clear();
 
     showDialog<void>(
@@ -49,8 +95,12 @@ class _MileagePageState extends State<MileagePage> {
 
                 final mileage = int.tryParse(value);
 
-                if (mileage == null || mileage < 35000) {
-                  return 'Debe ser igual o mayor a 35.000 km';
+                if (mileage == null) {
+                  return 'Ingresa un kilometraje válido';
+                }
+
+                if (mileage < vehicle.mileage) {
+                  return 'Debe ser igual o mayor a ${_formatNumber(vehicle.mileage)} km';
                 }
 
                 return null;
@@ -70,12 +120,22 @@ class _MileagePageState extends State<MileagePage> {
                   return;
                 }
 
+                final newMileage = int.parse(_mileageController.text);
+
+                ref
+                    .read(mileageProvider.notifier)
+                    .addReading(vehicleId: vehicle.id, mileage: newMileage);
+
+                ref
+                    .read(vehiclesProvider.notifier)
+                    .updateMileage(vehicleId: vehicle.id, mileage: newMileage);
+
                 Navigator.of(dialogContext).pop();
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Kilometraje actualizado a ${_mileageController.text} km.',
+                      'Kilometraje actualizado a ${_formatNumber(newMileage)} km.',
                     ),
                   ),
                 );
@@ -90,10 +150,30 @@ class _MileagePageState extends State<MileagePage> {
 
   @override
   Widget build(BuildContext context) {
+    final vehicle = ref.watch(vehiclesProvider).selectedVehicle;
+
+    final mileageState = ref.watch(mileageProvider);
+
+    if (vehicle == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Kilometraje')),
+        body: Center(
+          child: FilledButton(
+            onPressed: () {
+              context.go(AppRoutes.vehicles);
+            },
+            child: const Text('Seleccionar vehículo'),
+          ),
+        ),
+      );
+    }
+
+    final readings = mileageState.forVehicle(vehicle.id);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Volver al vehÃ­culo',
+          tooltip: 'Volver al vehículo',
           onPressed: () {
             context.go(AppRoutes.vehicleDetail);
           },
@@ -107,95 +187,121 @@ class _MileagePageState extends State<MileagePage> {
         onPressed: _showRegisterMileageDialog,
         child: const Icon(Icons.add_rounded),
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.speed_rounded,
-                        color: AppColors.primary,
-                        size: 32,
-                      ),
+        children: [
+          Text(
+            vehicle.displayName,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            vehicle.plate,
+            style: const TextStyle(color: AppColors.textSecondary),
+          ),
+
+          const SizedBox(height: 16),
+
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    const SizedBox(width: 16),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Kilometraje actual',
-                            style: TextStyle(color: AppColors.textSecondary),
+                    child: const Icon(
+                      Icons.speed_rounded,
+                      color: AppColors.primary,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Kilometraje actual',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${_formatNumber(vehicle.mileage)} km',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            '35.000 km',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Text(
+            'Historial de lecturas',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+
+          const SizedBox(height: 12),
+
+          if (readings.isEmpty)
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.speed_outlined,
+                      size: 42,
+                      color: AppColors.textSecondary,
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'No hay lecturas adicionales registradas.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'El kilometraje inicial corresponde al registrado con el vehículo.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
               ),
-            ),
+            )
+          else
+            for (var i = 0; i < readings.length; i++) ...[
+              _MileageEntry(
+                value: '${_formatNumber(readings[i].mileage)} km',
+                date: _formatDate(readings[i].recordedAt),
+                difference: i < readings.length - 1
+                    ? '+${_formatNumber(readings[i].mileage - readings[i + 1].mileage)} km'
+                    : 'Lectura registrada',
+                isLatest: i == 0,
+              ),
+              if (i < readings.length - 1) const _TimelineConnector(),
+            ],
 
-            const SizedBox(height: 24),
+          const SizedBox(height: 24),
 
-            Text(
-              'Historial de lecturas',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-
-            const SizedBox(height: 12),
-
-            const _MileageEntry(
-              value: '35.000 km',
-              date: '20 Sep 2026',
-              difference: '+4.500 km',
-              isLatest: true,
-            ),
-
-            const _TimelineConnector(),
-
-            const _MileageEntry(
-              value: '30.500 km',
-              date: '05 Jul 2026',
-              difference: '+5.500 km',
-            ),
-
-            const _TimelineConnector(),
-
-            const _MileageEntry(
-              value: '25.000 km',
-              date: '12 Mar 2026',
-              difference: 'Registro inicial',
-            ),
-
-            const SizedBox(height: 24),
-
-            FilledButton.icon(
-              onPressed: _showRegisterMileageDialog,
-              icon: const Icon(Icons.add_road_rounded),
-              label: const Text('Registrar nueva lectura'),
-            ),
-          ],
-        ),
+          FilledButton.icon(
+            onPressed: _showRegisterMileageDialog,
+            icon: const Icon(Icons.add_road_rounded),
+            label: const Text('Registrar nueva lectura'),
+          ),
+        ],
       ),
     );
   }

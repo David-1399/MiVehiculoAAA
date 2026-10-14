@@ -1,7 +1,7 @@
 class Vehicle {
   const Vehicle({
     required this.id,
-    required this.type,
+    required this.vehicleTypeId,
     required this.brand,
     required this.model,
     required this.year,
@@ -10,7 +10,7 @@ class Vehicle {
   });
 
   final String id;
-  final String type;
+  final String vehicleTypeId;
   final String brand;
   final String model;
   final int year;
@@ -18,4 +18,24 @@ class Vehicle {
   final int mileage;
 
   String get displayName => '$brand $model';
+
+  Vehicle copyWith({
+    String? id,
+    String? vehicleTypeId,
+    String? brand,
+    String? model,
+    int? year,
+    String? plate,
+    int? mileage,
+  }) {
+    return Vehicle(
+      id: id ?? this.id,
+      vehicleTypeId: vehicleTypeId ?? this.vehicleTypeId,
+      brand: brand ?? this.brand,
+      model: model ?? this.model,
+      year: year ?? this.year,
+      plate: plate ?? this.plate,
+      mileage: mileage ?? this.mileage,
+    );
+  }
 }

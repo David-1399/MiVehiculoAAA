@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
 import '../controllers/vehicles_provider.dart';
 
 class VehicleDetailPage extends ConsumerWidget {
@@ -12,6 +13,7 @@ class VehicleDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(vehiclesProvider);
+    final catalogs = ref.watch(catalogsProvider).asData?.value;
     final vehicle = state.selectedVehicle;
 
     if (vehicle == null) {
@@ -129,7 +131,14 @@ class VehicleDetailPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _InfoRow(label: 'Tipo', value: vehicle.type),
+                    _InfoRow(
+                      label: 'Tipo',
+                      value:
+                          catalogs
+                              ?.vehicleTypeById(vehicle.vehicleTypeId)
+                              ?.name ??
+                          'Tipo no disponible',
+                    ),
                     const Divider(),
                     _InfoRow(label: 'Marca', value: vehicle.brand),
                     const Divider(),

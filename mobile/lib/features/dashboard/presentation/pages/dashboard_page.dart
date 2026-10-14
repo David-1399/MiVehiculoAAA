@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../notifications/presentation/controllers/alerts_provider.dart';
 import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
@@ -15,6 +16,7 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vehicles = ref.watch(vehiclesProvider).vehicles;
     final alerts = ref.watch(alertsProvider);
+    final catalogs = ref.watch(catalogsProvider).asData?.value;
 
     int? nextDistance;
 
@@ -163,7 +165,7 @@ class DashboardPage extends ConsumerWidget {
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            '${vehicle.type} \u00B7 ${vehicle.plate}',
+                                            '${catalogs?.vehicleTypeById(vehicle.vehicleTypeId)?.name ?? 'Tipo no disponible'} \u00B7 ${vehicle.plate}',
                                             style: const TextStyle(
                                               fontSize: 12,
                                               color: AppColors.textSecondary,

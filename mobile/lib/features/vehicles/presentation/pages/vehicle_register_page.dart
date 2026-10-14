@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
 import '../controllers/vehicles_provider.dart';
 
 class VehicleRegisterPage extends ConsumerStatefulWidget {
@@ -25,17 +26,7 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
   final _plateController = TextEditingController();
   final _mileageController = TextEditingController();
 
-  String? _vehicleType;
-
-  final List<String> _vehicleTypes = const [
-    'Motocicleta',
-    'Autom\u00F3vil',
-    'Camioneta',
-    'Van',
-    'Cami\u00F3n',
-    'Bus',
-    'Otro',
-  ];
+  String? _vehicleTypeId;
 
   @override
   void dispose() {
@@ -55,7 +46,7 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
     ref
         .read(vehiclesProvider.notifier)
         .addVehicle(
-          type: _vehicleType!,
+          vehicleTypeId: _vehicleTypeId!,
           brand: _brandController.text,
           model: _modelController.text,
           year: int.parse(_yearController.text),
@@ -64,7 +55,7 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
         );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Veh\u00EDculo registrado correctamente.')),
+      const SnackBar(content: Text('Vehículo registrado correctamente.')),
     );
 
     context.go(AppRoutes.vehicleDetail);
@@ -72,6 +63,8 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final catalogsAsync = ref.watch(catalogsProvider);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -81,7 +74,7 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
           },
           icon: const Icon(Icons.arrow_back_rounded),
         ),
-        title: const Text('Registrar veh\u00EDculo'),
+        title: const Text('Registrar vehículo'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -92,41 +85,58 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Datos del veh\u00EDculo',
+                  'Datos del vehículo',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Ingresa la informaci\u00F3n principal del veh\u00EDculo.',
+                  'Ingresa la información principal del vehículo.',
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 24),
-                DropdownButtonFormField<String>(
-                  initialValue: _vehicleType,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo de veh\u00EDculo',
-                    prefixIcon: Icon(Icons.category_outlined),
-                  ),
-                  items: _vehicleTypes.map((type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(type),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _vehicleType = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Selecciona el tipo de veh\u00EDculo';
-                    }
 
-                    return null;
+                catalogsAsync.when(
+                  data: (catalogs) {
+                    final items = catalogs.activeVehicleTypes;
+
+                    return DropdownButtonFormField<String>(
+                      initialValue: _vehicleTypeId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Tipo de vehículo',
+                        prefixIcon: Icon(Icons.category_outlined),
+                      ),
+                      items: items
+                          .map(
+                            (item) => DropdownMenuItem<String>(
+                              value: item.id,
+                              child: Text(item.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _vehicleTypeId = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Selecciona el tipo de vehículo';
+                        }
+
+                        return null;
+                      },
+                    );
                   },
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, _) => const Text(
+                    'No fue posible cargar los tipos de vehículo.',
+                    style: TextStyle(color: AppColors.error),
+                  ),
                 ),
+
                 const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _brandController,
                   textCapitalization: TextCapitalization.words,
@@ -142,7 +152,9 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _modelController,
                   textCapitalization: TextCapitalization.words,
@@ -158,7 +170,9 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _yearController,
                   keyboardType: TextInputType.number,
@@ -167,20 +181,22 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
                     LengthLimitingTextInputFormatter(4),
                   ],
                   decoration: const InputDecoration(
-                    labelText: 'A\u00F1o',
+                    labelText: 'Año',
                     prefixIcon: Icon(Icons.calendar_today_outlined),
                   ),
                   validator: (value) {
                     final year = int.tryParse(value ?? '');
 
                     if (year == null || year < 1900 || year > 2100) {
-                      return 'Ingresa un a\u00F1o v\u00E1lido';
+                      return 'Ingresa un año válido';
                     }
 
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _plateController,
                   textCapitalization: TextCapitalization.characters,
@@ -190,19 +206,21 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().length < 5) {
-                      return 'Ingresa una placa v\u00E1lida';
+                      return 'Ingresa una placa válida';
                     }
 
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _mileageController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: const InputDecoration(
-                    labelText: 'Kilometraje actual',
+                    labelText: 'Kilometraje',
                     suffixText: 'km',
                     prefixIcon: Icon(Icons.speed_rounded),
                   ),
@@ -210,30 +228,34 @@ class _VehicleRegisterPageState extends ConsumerState<VehicleRegisterPage> {
                     final mileage = int.tryParse(value ?? '');
 
                     if (mileage == null || mileage < 0) {
-                      return 'Ingresa un kilometraje v\u00E1lido';
+                      return 'Ingresa un kilometraje válido';
                     }
 
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 24),
+
                 OutlinedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                          'La c\u00E1mara se habilitar\u00E1 posteriormente.',
+                          'La cámara se habilitará con el módulo de evidencias.',
                         ),
                       ),
                     );
                   },
                   icon: const Icon(Icons.camera_alt_outlined),
-                  label: const Text('Agregar fotograf\u00EDa'),
+                  label: const Text('Agregar fotografía'),
                 ),
+
                 const SizedBox(height: 16),
+
                 FilledButton(
-                  onPressed: _submit,
-                  child: const Text('Guardar veh\u00EDculo'),
+                  onPressed: catalogsAsync.hasValue ? _submit : null,
+                  child: const Text('Guardar vehículo'),
                 ),
               ],
             ),
