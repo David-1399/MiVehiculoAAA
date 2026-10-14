@@ -69,7 +69,7 @@ class _MaintenanceRegisterPageState
     return '$day/$month/${_selectedDate.year}';
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -87,7 +87,7 @@ class _MaintenanceRegisterPageState
       return;
     }
 
-    ref
+    await ref
         .read(maintenanceProvider.notifier)
         .addMaintenance(
           vehicleId: vehicle.id,
@@ -101,6 +101,10 @@ class _MaintenanceRegisterPageState
               ? null
               : int.parse(_nextMileageController.text),
         );
+
+    if (!mounted) {
+      return;
+    }
 
     context.go(AppRoutes.maintenanceDetail);
   }

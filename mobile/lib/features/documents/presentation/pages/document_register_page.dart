@@ -81,7 +81,7 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -99,7 +99,7 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
       return;
     }
 
-    ref
+    await ref
         .read(documentsProvider.notifier)
         .addDocument(
           vehicleId: vehicle.id,
@@ -108,6 +108,10 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
           issueDate: _issueDate,
           expirationDate: _hasExpiration ? _expirationDate : null,
         );
+
+    if (!mounted) {
+      return;
+    }
 
     context.go(AppRoutes.documents);
   }

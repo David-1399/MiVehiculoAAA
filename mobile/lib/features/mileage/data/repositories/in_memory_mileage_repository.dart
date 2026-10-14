@@ -5,12 +5,7 @@ class InMemoryMileageRepository implements MileageRepository {
   final List<MileageRecord> _items = [];
 
   @override
-  List<MileageRecord> getAll() {
-    return List.unmodifiable(_items);
-  }
-
-  @override
-  List<MileageRecord> getByVehicleId(String vehicleId) {
+  Future<List<MileageRecord>> getByVehicleId(String vehicleId) async {
     final items = _items.where((item) => item.vehicleId == vehicleId).toList()
       ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
 
@@ -18,7 +13,7 @@ class InMemoryMileageRepository implements MileageRepository {
   }
 
   @override
-  MileageRecord create(MileageRecord record) {
+  Future<MileageRecord> create(MileageRecord record) async {
     _items.add(record);
     return record;
   }

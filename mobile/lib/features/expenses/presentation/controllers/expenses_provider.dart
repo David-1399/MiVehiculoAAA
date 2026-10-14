@@ -1,17 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/in_memory_expense_repository.dart';
+import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
+import '../../data/repositories/api_expense_repository.dart';
 import '../../domain/entities/expense.dart';
 import '../../domain/repositories/expense_repository.dart';
 
 final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
-  return InMemoryExpenseRepository();
+  return ApiExpenseRepository();
 });
 
 class ExpensesState {
-  const ExpensesState({this.items = const []});
+  const ExpensesState({this.items = const [], this.loading = false});
 
   final List<Expense> items;
+  final bool loading;
 
   List<Expense> forVehicle(String vehicleId) {
     final result = items.where((item) => item.vehicleId == vehicleId).toList()
@@ -33,10 +35,23 @@ class ExpensesNotifier extends Notifier<ExpensesState> {
 
   @override
   ExpensesState build() {
-    return ExpensesState(items: _repository.getAll());
+    final vehicleId = ref.watch(
+      vehiclesProvider.select((state) => state.selectedVehicleId),
+    );
+
+    if (vehicleId != null) {
+      Future<void>.microtask(() => refresh(vehicleId));
+    }
+
+    return const ExpensesState(loading: true);
   }
 
-  Expense addExpense({
+  Future<void> refresh(String vehicleId) async {
+    final items = await _repository.getByVehicleId(vehicleId);
+    state = ExpensesState(items: items);
+  }
+
+  Future<Expense> addExpense({
     required String vehicleId,
     required String expenseCategoryId,
     required String description,
@@ -44,11 +59,11 @@ class ExpensesNotifier extends Notifier<ExpensesState> {
     required DateTime date,
     String? maintenanceId,
     String? evidencePath,
-  }) {
+  }) async {
     final now = DateTime.now();
 
     final expense = Expense(
-      id: now.microsecondsSinceEpoch.toString(),
+      id: '',
       vehicleId: vehicleId,
       expenseCategoryId: expenseCategoryId,
       description: description.trim(),
@@ -60,17 +75,26 @@ class ExpensesNotifier extends Notifier<ExpensesState> {
       updatedAt: now,
     );
 
-    _repository.create(expense);
+    final saved = await _repository.create(expense);
+    final items = await _repository.getByVehicleId(vehicleId);
 
-    state = ExpensesState(items: _repository.getAll());
+    state = ExpensesState(items: items);
 
-    return expense;
+    return saved;
   }
 
-  void deleteExpense(String id) {
-    _repository.delete(id);
+  Future<void> deleteExpense(String id) async {
+    final vehicleId = ref.read(vehiclesProvider).selectedVehicleId;
 
-    state = ExpensesState(items: _repository.getAll());
+    await _repository.delete(id);
+
+    if (vehicleId == null) {
+      state = const ExpensesState();
+      return;
+    }
+
+    final items = await _repository.getByVehicleId(vehicleId);
+    state = ExpensesState(items: items);
   }
 
   String? _nullableText(String? value) {

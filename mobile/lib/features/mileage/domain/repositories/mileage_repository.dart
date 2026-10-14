@@ -1,9 +1,7 @@
 import '../entities/mileage_record.dart';
 
 abstract interface class MileageRepository {
-  List<MileageRecord> getAll();
+  Future<List<MileageRecord>> getByVehicleId(String vehicleId);
 
-  List<MileageRecord> getByVehicleId(String vehicleId);
-
-  MileageRecord create(MileageRecord record);
+  Future<MileageRecord> create(MileageRecord record);
 }

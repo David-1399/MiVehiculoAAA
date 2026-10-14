@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/catalogs/domain/entities/catalog_bundle.dart';
-import '../../data/repositories/in_memory_maintenance_repository.dart';
+import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
+import '../../data/repositories/api_maintenance_repository.dart';
 import '../../domain/entities/maintenance_record.dart';
 import '../../domain/repositories/maintenance_repository.dart';
 
@@ -21,7 +22,7 @@ extension MaintenanceFilterX on MaintenanceFilter {
 }
 
 final maintenanceRepositoryProvider = Provider<MaintenanceRepository>((ref) {
-  return InMemoryMaintenanceRepository();
+  return ApiMaintenanceRepository();
 });
 
 class MaintenanceState {
@@ -29,11 +30,13 @@ class MaintenanceState {
     this.items = const [],
     this.selectedMaintenanceId,
     this.filter = MaintenanceFilter.all,
+    this.loading = false,
   });
 
   final List<MaintenanceRecord> items;
   final String? selectedMaintenanceId;
   final MaintenanceFilter filter;
+  final bool loading;
 
   MaintenanceRecord? get selectedMaintenance {
     final id = selectedMaintenanceId;
@@ -66,7 +69,6 @@ class MaintenanceState {
 
     return vehicleItems.where((item) {
       final type = catalogs.maintenanceTypeById(item.maintenanceTypeId);
-
       return type?.attributes['category'] == expectedCategory;
     }).toList();
   }
@@ -75,12 +77,14 @@ class MaintenanceState {
     List<MaintenanceRecord>? items,
     String? selectedMaintenanceId,
     MaintenanceFilter? filter,
+    bool? loading,
   }) {
     return MaintenanceState(
       items: items ?? this.items,
       selectedMaintenanceId:
           selectedMaintenanceId ?? this.selectedMaintenanceId,
       filter: filter ?? this.filter,
+      loading: loading ?? this.loading,
     );
   }
 }
@@ -92,10 +96,33 @@ class MaintenanceNotifier extends Notifier<MaintenanceState> {
 
   @override
   MaintenanceState build() {
-    return MaintenanceState(items: _repository.getAll());
+    final vehicleId = ref.watch(
+      vehiclesProvider.select((state) => state.selectedVehicleId),
+    );
+
+    if (vehicleId != null) {
+      Future<void>.microtask(() => refresh(vehicleId));
+    }
+
+    return const MaintenanceState(loading: true);
   }
 
-  MaintenanceRecord addMaintenance({
+  Future<void> refresh(String vehicleId) async {
+    final filter = state.filter;
+    final selectedId = state.selectedMaintenanceId;
+
+    state = state.copyWith(loading: true);
+
+    final items = await _repository.getByVehicleId(vehicleId);
+
+    state = MaintenanceState(
+      items: items,
+      selectedMaintenanceId: selectedId,
+      filter: filter,
+    );
+  }
+
+  Future<MaintenanceRecord> addMaintenance({
     required String vehicleId,
     required String maintenanceTypeId,
     required DateTime date,
@@ -106,11 +133,11 @@ class MaintenanceNotifier extends Notifier<MaintenanceState> {
     int? nextMileage,
     DateTime? nextDate,
     String? evidencePath,
-  }) {
+  }) async {
     final now = DateTime.now();
 
     final maintenance = MaintenanceRecord(
-      id: now.microsecondsSinceEpoch.toString(),
+      id: '',
       vehicleId: vehicleId,
       maintenanceTypeId: maintenanceTypeId,
       date: date,
@@ -125,15 +152,16 @@ class MaintenanceNotifier extends Notifier<MaintenanceState> {
       updatedAt: now,
     );
 
-    _repository.create(maintenance);
+    final saved = await _repository.create(maintenance);
+    final items = await _repository.getByVehicleId(vehicleId);
 
     state = MaintenanceState(
-      items: _repository.getAll(),
-      selectedMaintenanceId: maintenance.id,
+      items: items,
+      selectedMaintenanceId: saved.id,
       filter: state.filter,
     );
 
-    return maintenance;
+    return saved;
   }
 
   void selectMaintenance(String id) {
@@ -144,10 +172,19 @@ class MaintenanceNotifier extends Notifier<MaintenanceState> {
     state = state.copyWith(filter: filter);
   }
 
-  void deleteMaintenance(String id) {
-    _repository.delete(id);
+  Future<void> deleteMaintenance(String id) async {
+    final vehicleId = ref.read(vehiclesProvider).selectedVehicleId;
 
-    state = MaintenanceState(items: _repository.getAll(), filter: state.filter);
+    await _repository.delete(id);
+
+    if (vehicleId == null) {
+      state = MaintenanceState(filter: state.filter);
+      return;
+    }
+
+    final items = await _repository.getByVehicleId(vehicleId);
+
+    state = MaintenanceState(items: items, filter: state.filter);
   }
 
   String? _nullableText(String? value) {

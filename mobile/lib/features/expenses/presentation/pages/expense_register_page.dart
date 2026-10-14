@@ -59,7 +59,7 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -70,7 +70,7 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
       return;
     }
 
-    ref
+    await ref
         .read(expensesProvider.notifier)
         .addExpense(
           vehicleId: vehicle.id,
@@ -79,6 +79,10 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
           amount: int.parse(_amountController.text),
           date: _selectedDate,
         );
+
+    if (!mounted) {
+      return;
+    }
 
     context.go(AppRoutes.expenses);
   }

@@ -1,20 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/in_memory_vehicle_document_repository.dart';
+import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
+import '../../data/repositories/api_vehicle_document_repository.dart';
 import '../../domain/entities/vehicle_document.dart';
 import '../../domain/repositories/vehicle_document_repository.dart';
 
 final vehicleDocumentRepositoryProvider = Provider<VehicleDocumentRepository>((
   ref,
 ) {
-  return InMemoryVehicleDocumentRepository();
+  return ApiVehicleDocumentRepository();
 });
 
 class DocumentsState {
-  const DocumentsState({this.items = const [], this.selectedDocumentId});
+  const DocumentsState({
+    this.items = const [],
+    this.selectedDocumentId,
+    this.loading = false,
+  });
 
   final List<VehicleDocument> items;
   final String? selectedDocumentId;
+  final bool loading;
 
   VehicleDocument? get selectedDocument {
     final id = selectedDocumentId;
@@ -64,21 +70,34 @@ class DocumentsNotifier extends Notifier<DocumentsState> {
 
   @override
   DocumentsState build() {
-    return DocumentsState(items: _repository.getAll());
+    final vehicleId = ref.watch(
+      vehiclesProvider.select((state) => state.selectedVehicleId),
+    );
+
+    if (vehicleId != null) {
+      Future<void>.microtask(() => refresh(vehicleId));
+    }
+
+    return const DocumentsState(loading: true);
   }
 
-  VehicleDocument addDocument({
+  Future<void> refresh(String vehicleId) async {
+    final items = await _repository.getByVehicleId(vehicleId);
+    state = DocumentsState(items: items);
+  }
+
+  Future<VehicleDocument> addDocument({
     required String vehicleId,
     required String documentTypeId,
     required String number,
     required DateTime issueDate,
     DateTime? expirationDate,
     String? evidencePath,
-  }) {
+  }) async {
     final now = DateTime.now();
 
     final document = VehicleDocument(
-      id: now.microsecondsSinceEpoch.toString(),
+      id: '',
       vehicleId: vehicleId,
       documentTypeId: documentTypeId,
       number: number.trim(),
@@ -89,24 +108,30 @@ class DocumentsNotifier extends Notifier<DocumentsState> {
       updatedAt: now,
     );
 
-    _repository.create(document);
+    final saved = await _repository.create(document);
+    final items = await _repository.getByVehicleId(vehicleId);
 
-    state = DocumentsState(
-      items: _repository.getAll(),
-      selectedDocumentId: document.id,
-    );
+    state = DocumentsState(items: items, selectedDocumentId: saved.id);
 
-    return document;
+    return saved;
   }
 
   void selectDocument(String id) {
     state = DocumentsState(items: state.items, selectedDocumentId: id);
   }
 
-  void deleteDocument(String id) {
-    _repository.delete(id);
+  Future<void> deleteDocument(String id) async {
+    final vehicleId = ref.read(vehiclesProvider).selectedVehicleId;
 
-    state = DocumentsState(items: _repository.getAll());
+    await _repository.delete(id);
+
+    if (vehicleId == null) {
+      state = const DocumentsState();
+      return;
+    }
+
+    final items = await _repository.getByVehicleId(vehicleId);
+    state = DocumentsState(items: items);
   }
 
   String? _nullableText(String? value) {

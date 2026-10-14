@@ -1,15 +1,11 @@
 import '../entities/expense.dart';
 
 abstract interface class ExpenseRepository {
-  List<Expense> getAll();
+  Future<List<Expense>> getByVehicleId(String vehicleId);
 
-  List<Expense> getByVehicleId(String vehicleId);
+  Future<Expense> create(Expense expense);
 
-  Expense? getById(String id);
+  Future<Expense> update(Expense expense);
 
-  Expense create(Expense expense);
-
-  Expense update(Expense expense);
-
-  void delete(String id);
+  Future<void> delete(String id);
 }

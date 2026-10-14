@@ -1,15 +1,13 @@
 import '../entities/maintenance_record.dart';
 
 abstract interface class MaintenanceRepository {
-  List<MaintenanceRecord> getAll();
+  Future<List<MaintenanceRecord>> getByVehicleId(String vehicleId);
 
-  List<MaintenanceRecord> getByVehicleId(String vehicleId);
+  Future<MaintenanceRecord?> getById(String id);
 
-  MaintenanceRecord? getById(String id);
+  Future<MaintenanceRecord> create(MaintenanceRecord maintenance);
 
-  MaintenanceRecord create(MaintenanceRecord maintenance);
+  Future<MaintenanceRecord> update(MaintenanceRecord maintenance);
 
-  MaintenanceRecord update(MaintenanceRecord maintenance);
-
-  void delete(String id);
+  Future<void> delete(String id);
 }

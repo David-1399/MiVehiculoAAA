@@ -5,19 +5,14 @@ class InMemoryMaintenanceRepository implements MaintenanceRepository {
   final List<MaintenanceRecord> _items = [];
 
   @override
-  List<MaintenanceRecord> getAll() {
-    return List.unmodifiable(_items);
-  }
-
-  @override
-  List<MaintenanceRecord> getByVehicleId(String vehicleId) {
+  Future<List<MaintenanceRecord>> getByVehicleId(String vehicleId) async {
     return List.unmodifiable(
       _items.where((item) => item.vehicleId == vehicleId).toList(),
     );
   }
 
   @override
-  MaintenanceRecord? getById(String id) {
+  Future<MaintenanceRecord?> getById(String id) async {
     for (final item in _items) {
       if (item.id == id) {
         return item;
@@ -28,14 +23,13 @@ class InMemoryMaintenanceRepository implements MaintenanceRepository {
   }
 
   @override
-  MaintenanceRecord create(MaintenanceRecord maintenance) {
+  Future<MaintenanceRecord> create(MaintenanceRecord maintenance) async {
     _items.add(maintenance);
-
     return maintenance;
   }
 
   @override
-  MaintenanceRecord update(MaintenanceRecord maintenance) {
+  Future<MaintenanceRecord> update(MaintenanceRecord maintenance) async {
     final index = _items.indexWhere((item) => item.id == maintenance.id);
 
     if (index == -1) {
@@ -43,12 +37,11 @@ class InMemoryMaintenanceRepository implements MaintenanceRepository {
     }
 
     _items[index] = maintenance;
-
     return maintenance;
   }
 
   @override
-  void delete(String id) {
+  Future<void> delete(String id) async {
     _items.removeWhere((item) => item.id == id);
   }
 }

@@ -1,15 +1,11 @@
 import '../entities/vehicle_document.dart';
 
 abstract interface class VehicleDocumentRepository {
-  List<VehicleDocument> getAll();
+  Future<List<VehicleDocument>> getByVehicleId(String vehicleId);
 
-  List<VehicleDocument> getByVehicleId(String vehicleId);
+  Future<VehicleDocument> create(VehicleDocument document);
 
-  VehicleDocument? getById(String id);
+  Future<VehicleDocument> update(VehicleDocument document);
 
-  VehicleDocument create(VehicleDocument document);
-
-  VehicleDocument update(VehicleDocument document);
-
-  void delete(String id);
+  Future<void> delete(String id);
 }

@@ -109,26 +109,34 @@ class _MileagePageState extends ConsumerState<MileagePage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(dialogContext).pop();
               },
               child: const Text('Cancelar'),
             ),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 if (!_formKey.currentState!.validate()) {
                   return;
                 }
 
                 final newMileage = int.parse(_mileageController.text);
 
-                ref
+                await ref
                     .read(mileageProvider.notifier)
                     .addReading(vehicleId: vehicle.id, mileage: newMileage);
 
                 ref
                     .read(vehiclesProvider.notifier)
                     .updateMileage(vehicleId: vehicle.id, mileage: newMileage);
+
+                if (!mounted) {
+                  return;
+                }
+
+                if (!dialogContext.mounted) {
+                  return;
+                }
 
                 Navigator.of(dialogContext).pop();
 

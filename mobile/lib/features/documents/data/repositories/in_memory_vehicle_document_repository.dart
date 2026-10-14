@@ -5,12 +5,7 @@ class InMemoryVehicleDocumentRepository implements VehicleDocumentRepository {
   final List<VehicleDocument> _items = [];
 
   @override
-  List<VehicleDocument> getAll() {
-    return List.unmodifiable(_items);
-  }
-
-  @override
-  List<VehicleDocument> getByVehicleId(String vehicleId) {
+  Future<List<VehicleDocument>> getByVehicleId(String vehicleId) async {
     final result = _items.where((item) => item.vehicleId == vehicleId).toList()
       ..sort((a, b) => b.issueDate.compareTo(a.issueDate));
 
@@ -18,24 +13,13 @@ class InMemoryVehicleDocumentRepository implements VehicleDocumentRepository {
   }
 
   @override
-  VehicleDocument? getById(String id) {
-    for (final item in _items) {
-      if (item.id == id) {
-        return item;
-      }
-    }
-
-    return null;
-  }
-
-  @override
-  VehicleDocument create(VehicleDocument document) {
+  Future<VehicleDocument> create(VehicleDocument document) async {
     _items.add(document);
     return document;
   }
 
   @override
-  VehicleDocument update(VehicleDocument document) {
+  Future<VehicleDocument> update(VehicleDocument document) async {
     final index = _items.indexWhere((item) => item.id == document.id);
 
     if (index == -1) {
@@ -47,7 +31,7 @@ class InMemoryVehicleDocumentRepository implements VehicleDocumentRepository {
   }
 
   @override
-  void delete(String id) {
+  Future<void> delete(String id) async {
     _items.removeWhere((item) => item.id == id);
   }
 }

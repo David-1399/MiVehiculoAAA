@@ -1,17 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/in_memory_mileage_repository.dart';
+import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
+import '../../data/repositories/api_mileage_repository.dart';
 import '../../domain/entities/mileage_record.dart';
 import '../../domain/repositories/mileage_repository.dart';
 
 final mileageRepositoryProvider = Provider<MileageRepository>((ref) {
-  return InMemoryMileageRepository();
+  return ApiMileageRepository();
 });
 
 class MileageState {
-  const MileageState({this.items = const []});
+  const MileageState({this.items = const [], this.loading = false});
 
   final List<MileageRecord> items;
+  final bool loading;
 
   List<MileageRecord> forVehicle(String vehicleId) {
     final result = items.where((item) => item.vehicleId == vehicleId).toList()
@@ -28,29 +30,46 @@ class MileageNotifier extends Notifier<MileageState> {
 
   @override
   MileageState build() {
-    return MileageState(items: _repository.getAll());
+    final vehicleId = ref.watch(
+      vehiclesProvider.select((state) => state.selectedVehicleId),
+    );
+
+    if (vehicleId != null) {
+      Future<void>.microtask(() => refresh(vehicleId));
+    }
+
+    return const MileageState(loading: true);
   }
 
-  MileageRecord addReading({
+  Future<void> refresh(String vehicleId) async {
+    state = MileageState(items: state.items, loading: true);
+
+    final items = await _repository.getByVehicleId(vehicleId);
+
+    state = MileageState(items: items);
+  }
+
+  Future<MileageRecord> addReading({
     required String vehicleId,
     required int mileage,
     DateTime? recordedAt,
-  }) {
+  }) async {
     final now = DateTime.now();
 
     final record = MileageRecord(
-      id: now.microsecondsSinceEpoch.toString(),
+      id: '',
       vehicleId: vehicleId,
       mileage: mileage,
       recordedAt: recordedAt ?? now,
       createdAt: now,
     );
 
-    _repository.create(record);
+    final saved = await _repository.create(record);
+    final items = await _repository.getByVehicleId(vehicleId);
 
-    state = MileageState(items: _repository.getAll());
+    state = MileageState(items: items);
 
-    return record;
+    return saved;
   }
 }
 
