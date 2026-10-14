@@ -19,9 +19,13 @@ abstract final class AppRoutes {
 
   static const String documents = '/documents';
   static const String documentRegister = '/documents/register';
+  static const String documentDetail = '/documents/detail';
+  static const String documentEdit = '/documents/edit';
 
   static const String expenses = '/expenses';
   static const String expenseRegister = '/expenses/register';
+  static const String expenseDetail = '/expenses/detail';
+  static const String expenseEdit = '/expenses/edit';
 
   static const String notifications = '/notifications';
 

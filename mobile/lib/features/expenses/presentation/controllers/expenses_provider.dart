@@ -10,10 +10,31 @@ final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
 });
 
 class ExpensesState {
-  const ExpensesState({this.items = const [], this.loading = false});
+  const ExpensesState({
+    this.items = const [],
+    this.selectedExpenseId,
+    this.loading = false,
+  });
 
   final List<Expense> items;
+  final String? selectedExpenseId;
   final bool loading;
+
+  Expense? get selectedExpense {
+    final id = selectedExpenseId;
+
+    if (id == null) {
+      return null;
+    }
+
+    for (final item in items) {
+      if (item.id == id) {
+        return item;
+      }
+    }
+
+    return null;
+  }
 
   List<Expense> forVehicle(String vehicleId) {
     final result = items.where((item) => item.vehicleId == vehicleId).toList()
@@ -47,8 +68,10 @@ class ExpensesNotifier extends Notifier<ExpensesState> {
   }
 
   Future<void> refresh(String vehicleId) async {
+    final selectedId = state.selectedExpenseId;
     final items = await _repository.getByVehicleId(vehicleId);
-    state = ExpensesState(items: items);
+
+    state = ExpensesState(items: items, selectedExpenseId: selectedId);
   }
 
   Future<Expense> addExpense({
@@ -78,9 +101,40 @@ class ExpensesNotifier extends Notifier<ExpensesState> {
     final saved = await _repository.create(expense);
     final items = await _repository.getByVehicleId(vehicleId);
 
-    state = ExpensesState(items: items);
+    state = ExpensesState(items: items, selectedExpenseId: saved.id);
 
     return saved;
+  }
+
+  Future<Expense> updateExpense({
+    required Expense current,
+    required String expenseCategoryId,
+    required String description,
+    required int amount,
+    required DateTime date,
+    String? evidencePath,
+    bool clearEvidencePath = false,
+  }) async {
+    final updated = current.copyWith(
+      expenseCategoryId: expenseCategoryId,
+      description: description.trim(),
+      amount: amount,
+      date: date,
+      evidencePath: _nullableText(evidencePath),
+      clearEvidencePath: clearEvidencePath,
+      updatedAt: DateTime.now(),
+    );
+
+    final saved = await _repository.update(updated);
+    final items = await _repository.getByVehicleId(current.vehicleId);
+
+    state = ExpensesState(items: items, selectedExpenseId: saved.id);
+
+    return saved;
+  }
+
+  void selectExpense(String id) {
+    state = ExpensesState(items: state.items, selectedExpenseId: id);
   }
 
   Future<void> deleteExpense(String id) async {

@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../auth/presentation/controllers/auth_provider.dart';
+import '../../../maintenance/presentation/controllers/upcoming_maintenance_provider.dart';
 import '../../../notifications/presentation/controllers/alerts_provider.dart';
 import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
 
@@ -17,15 +18,18 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vehicles = ref.watch(vehiclesProvider).vehicles;
     final alerts = ref.watch(alertsProvider);
+    final unreadAlerts = alerts.where((alert) => !alert.isRead).toList();
+    final upcoming = ref.watch(upcomingMaintenanceProvider);
     final session = ref.watch(authProvider).asData?.value;
     final catalogs = ref.watch(catalogsProvider).asData?.value;
 
     int? nextDistance;
 
-    for (final alert in alerts) {
-      final distance = alert.distanceKm;
+    for (final item in upcoming) {
+      final distance = item.remainingKm;
 
       if (distance != null &&
+          distance >= 0 &&
           (nextDistance == null || distance < nextDistance)) {
         nextDistance = distance;
       }
@@ -91,7 +95,7 @@ class DashboardPage extends ConsumerWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _MetricCard(
-                            value: alerts.length.toString(),
+                            value: unreadAlerts.length.toString(),
                             label: 'Alertas',
                             valueColor: AppColors.warning,
                             onTap: () {
@@ -201,7 +205,7 @@ class DashboardPage extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    if (alerts.isEmpty)
+                    if (unreadAlerts.isEmpty)
                       const Card(
                         child: Padding(
                           padding: EdgeInsets.all(16),
@@ -209,7 +213,7 @@ class DashboardPage extends ConsumerWidget {
                         ),
                       )
                     else
-                      ...alerts.take(2).map((alert) {
+                      ...unreadAlerts.take(2).map((alert) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: Card(

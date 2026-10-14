@@ -48,7 +48,6 @@ class ExpensesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final vehicle = ref.watch(vehiclesProvider).selectedVehicle;
-
     final expensesState = ref.watch(expensesProvider);
     final catalogs = ref.watch(catalogsProvider).asData?.value;
 
@@ -67,7 +66,6 @@ class ExpensesPage extends ConsumerWidget {
     }
 
     final expenses = expensesState.forVehicle(vehicle.id);
-
     final total = expensesState.totalForVehicle(vehicle.id);
 
     return Scaffold(
@@ -101,9 +99,7 @@ class ExpensesPage extends ConsumerWidget {
             vehicle.plate,
             style: const TextStyle(color: AppColors.textSecondary),
           ),
-
           const SizedBox(height: 20),
-
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -146,9 +142,7 @@ class ExpensesPage extends ConsumerWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 24),
-
           Row(
             children: [
               Expanded(
@@ -166,9 +160,7 @@ class ExpensesPage extends ConsumerWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 8),
-
           if (expenses.isEmpty)
             const Card(
               child: Padding(
@@ -186,12 +178,6 @@ class ExpensesPage extends ConsumerWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Registra los gastos asociados a este vehículo.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
                   ],
                 ),
               ),
@@ -203,6 +189,13 @@ class ExpensesPage extends ConsumerWidget {
                 child: Card(
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(14),
+                    onTap: () {
+                      ref
+                          .read(expensesProvider.notifier)
+                          .selectExpense(expense.id);
+
+                      context.push(AppRoutes.expenseDetail);
+                    },
                     leading: Container(
                       width: 46,
                       height: 46,
@@ -210,8 +203,10 @@ class ExpensesPage extends ConsumerWidget {
                         color: AppColors.secondary.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(
-                        Icons.receipt_long_outlined,
+                      child: Icon(
+                        expense.evidencePath == null
+                            ? Icons.receipt_long_outlined
+                            : Icons.photo_camera_outlined,
                         color: AppColors.secondary,
                       ),
                     ),
@@ -230,9 +225,7 @@ class ExpensesPage extends ConsumerWidget {
                 ),
               );
             }),
-
           const SizedBox(height: 16),
-
           FilledButton.icon(
             onPressed: () {
               context.push(AppRoutes.expenseRegister);

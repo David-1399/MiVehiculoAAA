@@ -47,7 +47,6 @@ class DocumentsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final vehicle = ref.watch(vehiclesProvider).selectedVehicle;
-
     final documentsState = ref.watch(documentsProvider);
     final catalogs = ref.watch(catalogsProvider).asData?.value;
 
@@ -99,7 +98,6 @@ class DocumentsPage extends ConsumerWidget {
             style: const TextStyle(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 24),
-
           if (documents.isEmpty)
             const Card(
               child: Padding(
@@ -130,89 +128,116 @@ class DocumentsPage extends ConsumerWidget {
           else
             ...documents.map((document) {
               final status = document.statusAt(DateTime.now());
-
               final color = _statusColor(status);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.10),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.description_outlined,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                catalogs
-                                        ?.documentTypeById(
-                                          document.documentTypeId,
-                                        )
-                                        ?.name ??
-                                    'Tipo no disponible',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                document.number,
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                document.expirationDate == null
-                                    ? 'Sin fecha de vencimiento'
-                                    : 'Vence: ${_date(document.expirationDate!)}',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            status.label,
-                            style: TextStyle(
-                              color: color,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      ref
+                          .read(documentsProvider.notifier)
+                          .selectDocument(document.id);
+
+                      context.push(AppRoutes.documentDetail);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.description_outlined,
+                              color: AppColors.primary,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  catalogs
+                                          ?.documentTypeById(
+                                            document.documentTypeId,
+                                          )
+                                          ?.name ??
+                                      'Tipo no disponible',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  document.number,
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  document.expirationDate == null
+                                      ? 'Sin fecha de vencimiento'
+                                      : 'Vence: ${_date(document.expirationDate!)}',
+                                ),
+                                if (document.evidencePath != null) ...[
+                                  const SizedBox(height: 6),
+                                  const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.photo_camera_outlined,
+                                        size: 16,
+                                        color: AppColors.secondary,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Con evidencia fotográfica',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.secondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              status.label,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               );
             }),
-
           const SizedBox(height: 12),
-
           FilledButton.icon(
             onPressed: () {
               context.push(AppRoutes.documentRegister);

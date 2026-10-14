@@ -36,6 +36,7 @@ class Expense {
     String? maintenanceId,
     bool clearMaintenanceId = false,
     String? evidencePath,
+    bool clearEvidencePath = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -49,7 +50,9 @@ class Expense {
       maintenanceId: clearMaintenanceId
           ? null
           : maintenanceId ?? this.maintenanceId,
-      evidencePath: evidencePath ?? this.evidencePath,
+      evidencePath: clearEvidencePath
+          ? null
+          : evidencePath ?? this.evidencePath,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

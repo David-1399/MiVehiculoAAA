@@ -5,8 +5,12 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/documents/presentation/pages/document_detail_page.dart';
+import '../../features/documents/presentation/pages/document_edit_page.dart';
 import '../../features/documents/presentation/pages/document_register_page.dart';
 import '../../features/documents/presentation/pages/documents_page.dart';
+import '../../features/expenses/presentation/pages/expense_detail_page.dart';
+import '../../features/expenses/presentation/pages/expense_edit_page.dart';
 import '../../features/expenses/presentation/pages/expense_register_page.dart';
 import '../../features/expenses/presentation/pages/expenses_page.dart';
 import '../../features/maintenance/presentation/pages/maintenance_detail_page.dart';
@@ -85,16 +89,32 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const DocumentRegisterPage(),
     ),
     GoRoute(
+      path: AppRoutes.documentDetail,
+      builder: (context, state) => const DocumentDetailPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.documentEdit,
+      builder: (context, state) => const DocumentEditPage(),
+    ),
+    GoRoute(
       path: AppRoutes.expenses,
       builder: (context, state) => const ExpensesPage(),
     ),
     GoRoute(
-      path: AppRoutes.notifications,
-      builder: (context, state) => const NotificationsPage(),
-    ),
-    GoRoute(
       path: AppRoutes.expenseRegister,
       builder: (context, state) => const ExpenseRegisterPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.expenseDetail,
+      builder: (context, state) => const ExpenseDetailPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.expenseEdit,
+      builder: (context, state) => const ExpenseEditPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.notifications,
+      builder: (context, state) => const NotificationsPage(),
     ),
     GoRoute(
       path: AppRoutes.profile,

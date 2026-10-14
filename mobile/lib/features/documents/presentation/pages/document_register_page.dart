@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
+import '../../../../core/evidence/evidence_upload_service.dart';
+import '../../../../core/network/api_exception.dart';
+import '../../../../core/widgets/evidence_camera_field.dart';
 import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
 import '../controllers/documents_provider.dart';
 
@@ -19,16 +22,17 @@ class DocumentRegisterPage extends ConsumerStatefulWidget {
 
 class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
   final _formKey = GlobalKey<FormState>();
-
   final _numberController = TextEditingController();
+  final _evidenceUploadService = EvidenceUploadService();
 
   String? _documentTypeId;
+  String? _evidenceLocalPath;
 
   DateTime _issueDate = DateTime.now();
-
   DateTime? _expirationDate;
 
   bool _hasExpiration = true;
+  bool _saving = false;
 
   @override
   void dispose() {
@@ -38,7 +42,6 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
 
   String _date(DateTime value) {
     final day = value.day.toString().padLeft(2, '0');
-
     final month = value.month.toString().padLeft(2, '0');
 
     return '$day/$month/${value.year}';
@@ -52,7 +55,7 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
       lastDate: DateTime.now(),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       setState(() {
         _issueDate = result;
 
@@ -74,7 +77,7 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
       lastDate: DateTime(2100),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       setState(() {
         _expirationDate = result;
       });
@@ -82,7 +85,7 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_saving || !_formKey.currentState!.validate()) {
       return;
     }
 
@@ -99,27 +102,62 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
       return;
     }
 
-    await ref
-        .read(documentsProvider.notifier)
-        .addDocument(
-          vehicleId: vehicle.id,
-          documentTypeId: _documentTypeId!,
-          number: _numberController.text,
-          issueDate: _issueDate,
-          expirationDate: _hasExpiration ? _expirationDate : null,
+    setState(() {
+      _saving = true;
+    });
+
+    try {
+      String? evidencePath;
+
+      if (_evidenceLocalPath != null) {
+        evidencePath = await _evidenceUploadService.uploadImage(
+          _evidenceLocalPath!,
         );
+      }
 
-    if (!mounted) {
-      return;
+      await ref
+          .read(documentsProvider.notifier)
+          .addDocument(
+            vehicleId: vehicle.id,
+            documentTypeId: _documentTypeId!,
+            number: _numberController.text,
+            issueDate: _issueDate,
+            expirationDate: _hasExpiration ? _expirationDate : null,
+            evidencePath: evidencePath,
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      context.go(AppRoutes.documents);
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No fue posible guardar el documento.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+        });
+      }
     }
-
-    context.go(AppRoutes.documents);
   }
 
   @override
   Widget build(BuildContext context) {
     final vehicle = ref.watch(vehiclesProvider).selectedVehicle;
-
     final catalogsAsync = ref.watch(catalogsProvider);
 
     return Scaffold(
@@ -127,9 +165,11 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {
-            context.go(AppRoutes.documents);
-          },
+          onPressed: _saving
+              ? null
+              : () {
+                  context.go(AppRoutes.documents);
+                },
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: const Text(
@@ -151,11 +191,8 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
                       ? 'Vehículo no seleccionado'
                       : '${vehicle.displayName} (${vehicle.plate})',
                 ),
-
                 const SizedBox(height: 10),
-
                 const _FieldLabel('Tipo de documento'),
-
                 catalogsAsync.when(
                   data: (catalogs) {
                     return DropdownButtonFormField<String>(
@@ -172,15 +209,18 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
                             ),
                           )
                           .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _documentTypeId = value;
-                        });
-                      },
+                      onChanged: _saving
+                          ? null
+                          : (value) {
+                              setState(() {
+                                _documentTypeId = value;
+                              });
+                            },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Selecciona el tipo de documento';
                         }
+
                         return null;
                       },
                     );
@@ -191,12 +231,11 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
                     style: TextStyle(color: AppColors.error),
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
                 const _FieldLabel('Número'),
                 TextFormField(
                   controller: _numberController,
+                  enabled: !_saving,
                   decoration: const InputDecoration(
                     hintText: 'Número del documento',
                   ),
@@ -208,14 +247,13 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 10),
-
                 const _FieldLabel('Fecha de expedición'),
-                _DateField(value: _date(_issueDate), onTap: _pickIssueDate),
-
+                _DateField(
+                  value: _date(_issueDate),
+                  onTap: _saving ? null : _pickIssueDate,
+                ),
                 const SizedBox(height: 12),
-
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text(
@@ -223,17 +261,18 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                   value: _hasExpiration,
-                  onChanged: (value) {
-                    setState(() {
-                      _hasExpiration = value;
+                  onChanged: _saving
+                      ? null
+                      : (value) {
+                          setState(() {
+                            _hasExpiration = value;
 
-                      if (!value) {
-                        _expirationDate = null;
-                      }
-                    });
-                  },
+                            if (!value) {
+                              _expirationDate = null;
+                            }
+                          });
+                        },
                 ),
-
                 if (_hasExpiration) ...[
                   const SizedBox(height: 4),
                   const _FieldLabel('Fecha de vencimiento'),
@@ -241,48 +280,33 @@ class _DocumentRegisterPageState extends ConsumerState<DocumentRegisterPage> {
                     value: _expirationDate == null
                         ? 'Seleccionar'
                         : _date(_expirationDate!),
-                    onTap: _pickExpirationDate,
+                    onTap: _saving ? null : _pickExpirationDate,
                   ),
                 ],
-
                 const SizedBox(height: 26),
-
-                const _FieldLabel('Archivo o fotografía'),
-                Container(
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.camera_alt_outlined,
-                        color: AppColors.secondary,
-                        size: 30,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'La captura de evidencia se habilitará con el módulo de cámara.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+                const _FieldLabel('Fotografía de evidencia'),
+                EvidenceCameraField(
+                  filePath: _evidenceLocalPath,
+                  enabled: !_saving,
+                  onChanged: (value) {
+                    setState(() {
+                      _evidenceLocalPath = value;
+                    });
+                  },
                 ),
-
                 const SizedBox(height: 36),
-
                 FilledButton(
-                  onPressed: vehicle != null && catalogsAsync.hasValue
+                  onPressed:
+                      vehicle != null && catalogsAsync.hasValue && !_saving
                       ? _submit
                       : null,
-                  child: const Text('Guardar documento'),
+                  child: _saving
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Guardar documento'),
                 ),
               ],
             ),
@@ -344,7 +368,7 @@ class _DateField extends StatelessWidget {
   const _DateField({required this.value, required this.onTap});
 
   final String value;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

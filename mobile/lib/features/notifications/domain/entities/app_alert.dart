@@ -11,6 +11,8 @@ class AppAlert {
     required this.description,
     required this.level,
     required this.sourceType,
+    required this.isRead,
+    required this.createdAt,
     this.distanceKm,
     this.dueDate,
   });
@@ -22,10 +24,26 @@ class AppAlert {
   final String description;
   final AlertLevel level;
   final AlertSourceType sourceType;
+  final bool isRead;
+  final DateTime createdAt;
   final int? distanceKm;
   final DateTime? dueDate;
 
-  /// Compatibilidad con las vistas existentes.
-  /// El valor no esta quemado: se deriva del vehiculo real.
   String get vehicle => vehicleLabel;
+
+  AppAlert copyWith({bool? isRead, String? vehicleLabel}) {
+    return AppAlert(
+      id: id,
+      vehicleId: vehicleId,
+      vehicleLabel: vehicleLabel ?? this.vehicleLabel,
+      title: title,
+      description: description,
+      level: level,
+      sourceType: sourceType,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt,
+      distanceKm: distanceKm,
+      dueDate: dueDate,
+    );
+  }
 }

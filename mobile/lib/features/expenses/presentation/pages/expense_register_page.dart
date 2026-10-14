@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
+import '../../../../core/evidence/evidence_upload_service.dart';
+import '../../../../core/network/api_exception.dart';
+import '../../../../core/widgets/evidence_camera_field.dart';
 import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
 import '../controllers/expenses_provider.dart';
 
@@ -20,14 +23,16 @@ class ExpenseRegisterPage extends ConsumerStatefulWidget {
 
 class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
   final _formKey = GlobalKey<FormState>();
-
   final _descriptionController = TextEditingController();
-
   final _amountController = TextEditingController();
+  final _evidenceUploadService = EvidenceUploadService();
 
   String? _expenseCategoryId;
+  String? _evidenceLocalPath;
 
   DateTime _selectedDate = DateTime.now();
+
+  bool _saving = false;
 
   @override
   void dispose() {
@@ -38,7 +43,6 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
 
   String _date(DateTime value) {
     final day = value.day.toString().padLeft(2, '0');
-
     final month = value.month.toString().padLeft(2, '0');
 
     return '$day/$month/${value.year}';
@@ -52,7 +56,7 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
       lastDate: DateTime.now(),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       setState(() {
         _selectedDate = result;
       });
@@ -60,7 +64,7 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_saving || !_formKey.currentState!.validate()) {
       return;
     }
 
@@ -70,27 +74,62 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
       return;
     }
 
-    await ref
-        .read(expensesProvider.notifier)
-        .addExpense(
-          vehicleId: vehicle.id,
-          expenseCategoryId: _expenseCategoryId!,
-          description: _descriptionController.text,
-          amount: int.parse(_amountController.text),
-          date: _selectedDate,
+    setState(() {
+      _saving = true;
+    });
+
+    try {
+      String? evidencePath;
+
+      if (_evidenceLocalPath != null) {
+        evidencePath = await _evidenceUploadService.uploadImage(
+          _evidenceLocalPath!,
         );
+      }
 
-    if (!mounted) {
-      return;
+      await ref
+          .read(expensesProvider.notifier)
+          .addExpense(
+            vehicleId: vehicle.id,
+            expenseCategoryId: _expenseCategoryId!,
+            description: _descriptionController.text,
+            amount: int.parse(_amountController.text),
+            date: _selectedDate,
+            evidencePath: evidencePath,
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      context.go(AppRoutes.expenses);
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No fue posible guardar el gasto.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+        });
+      }
     }
-
-    context.go(AppRoutes.expenses);
   }
 
   @override
   Widget build(BuildContext context) {
     final vehicle = ref.watch(vehiclesProvider).selectedVehicle;
-
     final catalogsAsync = ref.watch(catalogsProvider);
 
     return Scaffold(
@@ -114,7 +153,6 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
                 ),
                 const SizedBox(height: 24),
               ],
-
               catalogsAsync.when(
                 data: (catalogs) {
                   return DropdownButtonFormField<String>(
@@ -132,15 +170,18 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
                           ),
                         )
                         .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _expenseCategoryId = value;
-                      });
-                    },
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            setState(() {
+                              _expenseCategoryId = value;
+                            });
+                          },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Selecciona la categoría';
                       }
+
                       return null;
                     },
                   );
@@ -151,11 +192,10 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
                   style: TextStyle(color: AppColors.error),
                 ),
               ),
-
               const SizedBox(height: 16),
-
               TextFormField(
                 controller: _descriptionController,
+                enabled: !_saving,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
                   labelText: 'Descripción',
@@ -170,11 +210,10 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
-
               TextFormField(
                 controller: _amountController,
+                enabled: !_saving,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
@@ -192,12 +231,10 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
-
               InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: _selectDate,
+                onTap: _saving ? null : _selectDate,
                 child: InputDecorator(
                   decoration: const InputDecoration(
                     labelText: 'Fecha',
@@ -206,14 +243,37 @@ class _ExpenseRegisterPageState extends ConsumerState<ExpenseRegisterPage> {
                   child: Text(_date(_selectedDate)),
                 ),
               ),
-
+              const SizedBox(height: 24),
+              const Text(
+                'Fotografía de soporte',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              EvidenceCameraField(
+                filePath: _evidenceLocalPath,
+                enabled: !_saving,
+                onChanged: (value) {
+                  setState(() {
+                    _evidenceLocalPath = value;
+                  });
+                },
+              ),
               const SizedBox(height: 28),
-
               FilledButton(
-                onPressed: vehicle != null && catalogsAsync.hasValue
+                onPressed: vehicle != null && catalogsAsync.hasValue && !_saving
                     ? _submit
                     : null,
-                child: const Text('Guardar gasto'),
+                child: _saving
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Guardar gasto'),
               ),
             ],
           ),

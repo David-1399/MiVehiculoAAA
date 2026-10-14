@@ -82,8 +82,10 @@ class DocumentsNotifier extends Notifier<DocumentsState> {
   }
 
   Future<void> refresh(String vehicleId) async {
+    final selectedId = state.selectedDocumentId;
     final items = await _repository.getByVehicleId(vehicleId);
-    state = DocumentsState(items: items);
+
+    state = DocumentsState(items: items, selectedDocumentId: selectedId);
   }
 
   Future<VehicleDocument> addDocument({
@@ -110,6 +112,35 @@ class DocumentsNotifier extends Notifier<DocumentsState> {
 
     final saved = await _repository.create(document);
     final items = await _repository.getByVehicleId(vehicleId);
+
+    state = DocumentsState(items: items, selectedDocumentId: saved.id);
+
+    return saved;
+  }
+
+  Future<VehicleDocument> updateDocument({
+    required VehicleDocument current,
+    required String documentTypeId,
+    required String number,
+    required DateTime issueDate,
+    required bool hasExpiration,
+    DateTime? expirationDate,
+    String? evidencePath,
+    bool clearEvidencePath = false,
+  }) async {
+    final updated = current.copyWith(
+      documentTypeId: documentTypeId,
+      number: number.trim(),
+      issueDate: issueDate,
+      expirationDate: expirationDate,
+      clearExpirationDate: !hasExpiration,
+      evidencePath: _nullableText(evidencePath),
+      clearEvidencePath: clearEvidencePath,
+      updatedAt: DateTime.now(),
+    );
+
+    final saved = await _repository.update(updated);
+    final items = await _repository.getByVehicleId(current.vehicleId);
 
     state = DocumentsState(items: items, selectedDocumentId: saved.id);
 

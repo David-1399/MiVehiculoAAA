@@ -47,7 +47,6 @@ class VehicleDocument {
     }
 
     final today = DateTime(now.year, now.month, now.day);
-
     final expirationDay = DateTime(
       expiration.year,
       expiration.month,
@@ -76,6 +75,7 @@ class VehicleDocument {
     DateTime? expirationDate,
     bool clearExpirationDate = false,
     String? evidencePath,
+    bool clearEvidencePath = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -88,7 +88,9 @@ class VehicleDocument {
       expirationDate: clearExpirationDate
           ? null
           : expirationDate ?? this.expirationDate,
-      evidencePath: evidencePath ?? this.evidencePath,
+      evidencePath: clearEvidencePath
+          ? null
+          : evidencePath ?? this.evidencePath,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

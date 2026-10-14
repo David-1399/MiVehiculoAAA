@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "dSc8BbyMUkkW3FyLeonuemKj1CKRfQnsvkAPqqp4dv4=",
+  "Hash": "A/FINQqA9oMJZX2FIf00YmcykXbyVnZPD+yj7QpyAmc=",
   "Source": "MiVehiculoAAA.Api",
   "BasePath": "_content/MiVehiculoAAA.Api",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "MiVehiculoAAA.Api\\wwwroot",
+      "Source": "MiVehiculoAAA.Api",
+      "ContentRoot": "C:\\DESARROLLOS\\MiVehiculoAAA\\backend\\MiVehiculoAAA.Api\\wwwroot\\",
+      "BasePath": "_content/MiVehiculoAAA.Api",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\DESARROLLOS\\MiVehiculoAAA\\backend\\MiVehiculoAAA.Api\\wwwroot\\uploads\\evidencias\\c1b189db4ff64edaab9abb9f5bddb7a4.jpg",
+      "SourceId": "MiVehiculoAAA.Api",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\DESARROLLOS\\MiVehiculoAAA\\backend\\MiVehiculoAAA.Api\\wwwroot\\",
+      "BasePath": "_content/MiVehiculoAAA.Api",
+      "RelativePath": "uploads/evidencias/c1b189db4ff64edaab9abb9f5bddb7a4.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\evidencias\\c1b189db4ff64edaab9abb9f5bddb7a4.jpg"
+    }
+  ]
 }

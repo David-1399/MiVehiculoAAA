@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\DESARROLLOS\\MiVehiculoAAA\\backend\\MiVehiculoAAA.Api\\wwwroot\\uploads\\evidencias\\c1b189db4ff64edaab9abb9f5bddb7a4.jpg",
+      "PackagePath": "staticwebassets\\uploads\\evidencias\\c1b189db4ff64edaab9abb9f5bddb7a4.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.MiVehiculoAAA.Api.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.MiVehiculoAAA.Api.props",
+      "PackagePath": "build\\MiVehiculoAAA.Api.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.MiVehiculoAAA.Api.props",
+      "PackagePath": "buildMultiTargeting\\MiVehiculoAAA.Api.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.MiVehiculoAAA.Api.props",
+      "PackagePath": "buildTransitive\\MiVehiculoAAA.Api.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
