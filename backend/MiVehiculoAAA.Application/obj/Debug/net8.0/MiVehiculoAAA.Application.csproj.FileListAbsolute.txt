@@ -1,0 +1,15 @@
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\bin\Debug\net8.0\MiVehiculoAAA.Application.deps.json
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\bin\Debug\net8.0\MiVehiculoAAA.Application.dll
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\bin\Debug\net8.0\MiVehiculoAAA.Application.pdb
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\bin\Debug\net8.0\MiVehiculoAAA.Domain.dll
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\bin\Debug\net8.0\MiVehiculoAAA.Domain.pdb
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.csproj.AssemblyReference.cache
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.AssemblyInfoInputs.cache
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.AssemblyInfo.cs
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.csproj.CoreCompileInputs.cache
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehicu.1A6ACE2E.Up2Date
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.dll
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\refint\MiVehiculoAAA.Application.dll
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.pdb
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\ref\MiVehiculoAAA.Application.dll
