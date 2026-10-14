@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../controllers/auth_provider.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  ConsumerState<SplashPage> createState() {
+    return _SplashPageState();
+  }
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
@@ -19,13 +23,23 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _initialize() async {
-    await Future<void>.delayed(const Duration(seconds: 2));
+    final startedAt = DateTime.now();
+
+    final session = await ref.read(authProvider.future);
+
+    final elapsed = DateTime.now().difference(startedAt);
+
+    const minimumDuration = Duration(seconds: 2);
+
+    if (elapsed < minimumDuration) {
+      await Future<void>.delayed(minimumDuration - elapsed);
+    }
 
     if (!mounted) {
       return;
     }
 
-    context.go(AppRoutes.login);
+    context.go(session == null ? AppRoutes.login : AppRoutes.dashboard);
   }
 
   @override

@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../controllers/auth_provider.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() {
+    return _LoginPageState();
+  }
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
+
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
@@ -26,8 +31,26 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final success = await ref
+        .read(authProvider.notifier)
+        .signIn(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No fue posible iniciar la sesión.')),
+      );
       return;
     }
 
@@ -36,6 +59,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    final loading = authState.isLoading;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -78,10 +105,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
+
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
+                  enabled: !loading,
                   decoration: const InputDecoration(
                     labelText: 'Correo electrónico',
                     hintText: 'correo@ejemplo.com',
@@ -92,27 +121,36 @@ class _LoginPageState extends State<LoginPage> {
                       return 'Ingresa tu correo electrónico';
                     }
 
-                    if (!value.contains('@')) {
+                    final email = value.trim();
+
+                    final regex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+                    if (!regex.hasMatch(email)) {
                       return 'Ingresa un correo válido';
                     }
 
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  enabled: !loading,
                   autofillHints: const [AutofillHints.password],
                   decoration: InputDecoration(
                     labelText: 'Contraseña',
                     prefixIcon: const Icon(Icons.lock_outline_rounded),
                     suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      onPressed: loading
+                          ? null
+                          : () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_outlined
@@ -131,37 +169,66 @@ class _LoginPageState extends State<LoginPage> {
 
                     return null;
                   },
+                  onFieldSubmitted: (_) {
+                    if (!loading) {
+                      _submit();
+                    }
+                  },
                 ),
+
                 const SizedBox(height: 8),
+
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      context.push(AppRoutes.forgotPassword);
-                    },
+                    onPressed: loading
+                        ? null
+                        : () {
+                            context.push(AppRoutes.forgotPassword);
+                          },
                     child: const Text('¿Olvidaste tu contraseña?'),
                   ),
                 ),
+
                 const SizedBox(height: 16),
+
                 FilledButton(
-                  onPressed: _submit,
-                  child: const Text('Iniciar sesión'),
+                  onPressed: loading ? null : _submit,
+                  child: loading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Iniciar sesión'),
                 ),
+
                 const SizedBox(height: 24),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      '¿No tienes una cuenta?',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
+                    const Text('¿No tienes cuenta?'),
                     TextButton(
-                      onPressed: () {
-                        context.push(AppRoutes.register);
-                      },
+                      onPressed: loading
+                          ? null
+                          : () {
+                              context.go(AppRoutes.register);
+                            },
                       child: const Text('Regístrate'),
                     ),
                   ],
+                ),
+
+                const SizedBox(height: 8),
+
+                const Text(
+                  'La autenticación contra servidor se conectará al implementar la API. La contraseña no se guarda localmente.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),

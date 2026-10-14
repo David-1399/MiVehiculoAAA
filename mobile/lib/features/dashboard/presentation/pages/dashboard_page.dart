@@ -6,6 +6,7 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/catalogs/presentation/controllers/catalogs_provider.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../auth/presentation/controllers/auth_provider.dart';
 import '../../../notifications/presentation/controllers/alerts_provider.dart';
 import '../../../vehicles/presentation/controllers/vehicles_provider.dart';
 
@@ -16,6 +17,7 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vehicles = ref.watch(vehiclesProvider).vehicles;
     final alerts = ref.watch(alertsProvider);
+    final session = ref.watch(authProvider).asData?.value;
     final catalogs = ref.watch(catalogsProvider).asData?.value;
 
     int? nextDistance;
@@ -55,8 +57,10 @@ class DashboardPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
-                      'Hola, Stiven',
+                    Text(
+                      session?.hasDisplayName == true
+                          ? 'Hola, ${session!.displayName}'
+                          : 'Hola',
                       style: TextStyle(
                         fontSize: 20,
                         height: 1.4,
