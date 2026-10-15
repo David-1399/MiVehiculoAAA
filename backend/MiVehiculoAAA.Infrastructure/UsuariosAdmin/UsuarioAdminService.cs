@@ -227,6 +227,35 @@ public class UsuarioAdminService : IUsuarioAdminService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task ActivarAsync(
+        Guid usuarioId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var usuario = await _dbContext.Usuarios
+            .FirstOrDefaultAsync(
+                x => x.Id == usuarioId,
+                cancellationToken
+            );
+
+        if (usuario is null)
+        {
+            throw new AppException(
+                "Usuario no encontrado.",
+                404
+            );
+        }
+
+        if (usuario.Activo)
+        {
+            return;
+        }
+
+        usuario.Activo = true;
+        usuario.FechaActualizacion = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
     private async Task ValidarCorreoDisponibleAsync(
         string correo,
         Guid? usuarioActualId,

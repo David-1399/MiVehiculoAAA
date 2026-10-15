@@ -111,6 +111,15 @@ class ApiAdminUserRepository implements AdminUserRepository {
     }
   }
 
+  @override
+  Future<void> activate(String id) async {
+    try {
+      await _apiClient.dio.put<void>('/api/admin/usuarios/$id/activar');
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
   AdminUser _fromJson(Map<String, dynamic> json) {
     return AdminUser(
       id: json['id']?.toString() ?? '',

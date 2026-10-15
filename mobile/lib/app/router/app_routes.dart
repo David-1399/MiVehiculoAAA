@@ -20,6 +20,7 @@ abstract final class AppRoutes {
   static const String maintenance = '/maintenance';
   static const String maintenanceRegister = '/maintenance/register';
   static const String maintenanceDetail = '/maintenance/detail';
+  static const String maintenanceEdit = '/maintenance/edit';
 
   static const String mileage = '/mileage';
 

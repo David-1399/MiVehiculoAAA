@@ -122,6 +122,68 @@ class AdminUserDetailPage extends ConsumerWidget {
                 label: const Text('Editar usuario'),
               ),
               const SizedBox(height: 10),
+              if (!user.isActive)
+                FilledButton.icon(
+                  onPressed: () async {
+                    final confirmed =
+                        await showDialog<bool>(
+                          context: context,
+                          builder: (dialogContext) {
+                            return AlertDialog(
+                              title: const Text('Reactivar usuario'),
+                              content: Text(
+                                '¿Deseas reactivar a ${user.fullName}?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop(false);
+                                  },
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop(true);
+                                  },
+                                  child: const Text('Reactivar'),
+                                ),
+                              ],
+                            );
+                          },
+                        ) ??
+                        false;
+
+                    if (!confirmed || !context.mounted) {
+                      return;
+                    }
+
+                    try {
+                      await ref
+                          .read(adminUsersProvider.notifier)
+                          .activateUser(user.id);
+
+                      if (!context.mounted) {
+                        return;
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Usuario reactivado correctamente.'),
+                        ),
+                      );
+                    } on ApiException catch (error) {
+                      if (!context.mounted) {
+                        return;
+                      }
+
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(error.message)));
+                    }
+                  },
+                  icon: const Icon(Icons.person_add_alt_1_rounded),
+                  label: const Text('Reactivar usuario'),
+                ),
+              if (!user.isActive) const SizedBox(height: 10),
               if (user.isActive)
                 OutlinedButton.icon(
                   onPressed: isSelf

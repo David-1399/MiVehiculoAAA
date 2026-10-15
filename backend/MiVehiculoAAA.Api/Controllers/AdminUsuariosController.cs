@@ -141,6 +141,34 @@ public class AdminUsuariosController : ControllerBase
         }
     }
 
+    [HttpPut("{id:guid}/activar")]
+    public async Task<IActionResult> Activar(
+        Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            await _usuarioAdminService.ActivarAsync(
+                id,
+                cancellationToken
+            );
+
+            return Ok(
+                new
+                {
+                    mensaje = "Usuario reactivado correctamente."
+                }
+            );
+        }
+        catch (AppException ex)
+        {
+            return StatusCode(
+                ex.StatusCode,
+                new { mensaje = ex.Message }
+            );
+        }
+    }
     private Guid ObtenerUsuarioActualId()
     {
         var idText =

@@ -29,4 +29,8 @@ public interface IUsuarioAdminService
         Guid administradorEjecutorId,
         CancellationToken cancellationToken = default
     );
+    Task ActivarAsync(
+        Guid usuarioId,
+        CancellationToken cancellationToken = default
+    );
 }

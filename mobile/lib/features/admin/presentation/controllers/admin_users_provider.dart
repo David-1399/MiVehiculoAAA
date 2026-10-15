@@ -138,6 +138,14 @@ class AdminUsersNotifier extends AsyncNotifier<AdminUsersState> {
     state = AsyncData(AdminUsersState(users: users, selectedUserId: id));
   }
 
+  Future<void> activateUser(String id) async {
+    await _repository.activate(id);
+
+    final users = await _repository.getAll();
+
+    state = AsyncData(AdminUsersState(users: users, selectedUserId: id));
+  }
+
   void selectUser(String id) {
     final current = state.asData?.value;
 

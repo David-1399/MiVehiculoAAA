@@ -172,6 +172,45 @@ class MaintenanceNotifier extends Notifier<MaintenanceState> {
     state = state.copyWith(filter: filter);
   }
 
+  Future<MaintenanceRecord> updateMaintenance({
+    required MaintenanceRecord current,
+    required String maintenanceTypeId,
+    required DateTime date,
+    required int mileage,
+    required int cost,
+    String? workshop,
+    String? observations,
+    int? nextMileage,
+    DateTime? nextDate,
+  }) async {
+    final updated = MaintenanceRecord(
+      id: current.id,
+      vehicleId: current.vehicleId,
+      maintenanceTypeId: maintenanceTypeId,
+      date: date,
+      mileage: mileage,
+      cost: cost,
+      workshop: _nullableText(workshop),
+      observations: _nullableText(observations),
+      nextMileage: nextMileage,
+      nextDate: nextDate,
+      evidencePath: current.evidencePath,
+      createdAt: current.createdAt,
+      updatedAt: DateTime.now(),
+    );
+
+    final saved = await _repository.update(updated);
+    final items = await _repository.getByVehicleId(current.vehicleId);
+
+    state = MaintenanceState(
+      items: items,
+      selectedMaintenanceId: saved.id,
+      filter: state.filter,
+    );
+
+    return saved;
+  }
+
   Future<void> deleteMaintenance(String id) async {
     final vehicleId = ref.read(vehiclesProvider).selectedVehicleId;
 

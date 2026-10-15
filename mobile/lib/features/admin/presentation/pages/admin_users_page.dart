@@ -34,7 +34,16 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage> {
 
     if (session?.role != UserRole.administrator) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Gestión de usuarios')),
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: 'Volver',
+            onPressed: () {
+              context.go(AppRoutes.dashboard);
+            },
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+          title: const Text('Gestión de usuarios'),
+        ),
         body: const Center(
           child: Text('Acceso exclusivo para administradores.'),
         ),
@@ -44,7 +53,16 @@ class _AdminUsersPageState extends ConsumerState<AdminUsersPage> {
     final usersAsync = ref.watch(adminUsersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestión de usuarios')),
+      appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Volver al panel',
+          onPressed: () {
+            context.go(AppRoutes.adminDashboard);
+          },
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
+        title: const Text('Gestión de usuarios'),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.push(AppRoutes.adminUserRegister);

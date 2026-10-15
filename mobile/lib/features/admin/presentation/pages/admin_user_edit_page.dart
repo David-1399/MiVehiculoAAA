@@ -246,6 +246,91 @@ class _AdminUserEditPageState extends ConsumerState<AdminUserEditPage> {
                       : const Text('Guardar cambios'),
                 ),
               ),
+              if (!current.isActive) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _saving
+                        ? null
+                        : () async {
+                            final confirmed =
+                                await showDialog<bool>(
+                                  context: context,
+                                  builder: (dialogContext) {
+                                    return AlertDialog(
+                                      title: const Text('Reactivar usuario'),
+                                      content: const Text(
+                                        '¿Deseas volver a activar este usuario?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(dialogContext)
+                                                .pop(false);
+                                          },
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        FilledButton(
+                                          onPressed: () {
+                                            Navigator.of(dialogContext)
+                                                .pop(true);
+                                          },
+                                          child: const Text('Reactivar'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ) ??
+                                false;
+
+                            if (!confirmed || !context.mounted) {
+                              return;
+                            }
+
+                            setState(() {
+                              _saving = true;
+                            });
+
+                            try {
+                              await ref
+                                  .read(adminUsersProvider.notifier)
+                                  .activateUser(current.id);
+
+                              if (!context.mounted) {
+                                return;
+                              }
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Usuario reactivado correctamente.',
+                                  ),
+                                ),
+                              );
+
+                              context.go(AppRoutes.adminUserDetail);
+                            } on ApiException catch (error) {
+                              if (!context.mounted) {
+                                return;
+                              }
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(error.message)),
+                              );
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _saving = false;
+                                });
+                              }
+                            }
+                          },
+                    icon: const Icon(Icons.person_add_alt_1_rounded),
+                    label: const Text('Reactivar este usuario'),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

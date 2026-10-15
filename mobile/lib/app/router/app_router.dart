@@ -19,6 +19,7 @@ import '../../features/expenses/presentation/pages/expense_edit_page.dart';
 import '../../features/expenses/presentation/pages/expense_register_page.dart';
 import '../../features/expenses/presentation/pages/expenses_page.dart';
 import '../../features/maintenance/presentation/pages/maintenance_detail_page.dart';
+import '../../features/maintenance/presentation/pages/maintenance_edit_page.dart';
 import '../../features/maintenance/presentation/pages/maintenance_page.dart';
 import '../../features/maintenance/presentation/pages/maintenance_register_page.dart';
 import '../../features/mileage/presentation/pages/mileage_page.dart';
@@ -100,6 +101,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.maintenanceDetail,
       builder: (context, state) => const MaintenanceDetailPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.maintenanceEdit,
+      builder: (context, state) => const MaintenanceEditPage(),
     ),
     GoRoute(
       path: AppRoutes.mileage,

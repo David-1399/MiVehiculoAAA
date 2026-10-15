@@ -25,4 +25,6 @@ abstract interface class AdminUserRepository {
   });
 
   Future<void> deactivate(String id);
+
+  Future<void> activate(String id);
 }
