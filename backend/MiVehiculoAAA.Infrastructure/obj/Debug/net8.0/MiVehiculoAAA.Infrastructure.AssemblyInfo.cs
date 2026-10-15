@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiVehiculoAAA.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+239077ab4c37e6638209d9c95c577428bc0f2fd9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b6f4bf7c30b308641a02db72f617882b50fcec96")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiVehiculoAAA.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiVehiculoAAA.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
