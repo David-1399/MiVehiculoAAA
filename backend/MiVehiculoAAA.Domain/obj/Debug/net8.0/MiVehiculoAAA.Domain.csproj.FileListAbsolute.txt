@@ -9,3 +9,4 @@ C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Domain\obj\Debug\net8.0\MiVeh
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Domain\obj\Debug\net8.0\refint\MiVehiculoAAA.Domain.dll
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Domain\obj\Debug\net8.0\MiVehiculoAAA.Domain.pdb
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Domain\obj\Debug\net8.0\ref\MiVehiculoAAA.Domain.dll
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Domain\obj\Debug\net8.0\MiVehiculoAAA.Domain.sourcelink.json

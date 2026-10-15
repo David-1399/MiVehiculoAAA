@@ -3,6 +3,11 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../../features/admin/presentation/pages/admin_user_detail_page.dart';
+import '../../features/admin/presentation/pages/admin_user_edit_page.dart';
+import '../../features/admin/presentation/pages/admin_user_register_page.dart';
+import '../../features/admin/presentation/pages/admin_users_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/documents/presentation/pages/document_detail_page.dart';
@@ -47,6 +52,26 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.dashboard,
       builder: (context, state) => const DashboardPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminDashboard,
+      builder: (context, state) => const AdminDashboardPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminUsers,
+      builder: (context, state) => const AdminUsersPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminUserRegister,
+      builder: (context, state) => const AdminUserRegisterPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminUserDetail,
+      builder: (context, state) => const AdminUserDetailPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.adminUserEdit,
+      builder: (context, state) => const AdminUserEditPage(),
     ),
     GoRoute(
       path: AppRoutes.vehicles,

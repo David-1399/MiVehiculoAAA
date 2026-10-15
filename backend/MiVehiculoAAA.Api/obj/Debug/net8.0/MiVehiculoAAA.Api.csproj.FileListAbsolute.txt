@@ -124,3 +124,4 @@ C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Api\bin\Debug\net8.0\Microsof
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Api\bin\Debug\net8.0\MiVehiculoAAA.Api.staticwebassets.runtime.json
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Api\obj\Debug\net8.0\MiVehiculoAAA.Api.sourcelink.json

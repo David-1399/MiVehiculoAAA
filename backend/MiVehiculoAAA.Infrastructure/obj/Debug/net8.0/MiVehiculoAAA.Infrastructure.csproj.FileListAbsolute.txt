@@ -17,3 +17,4 @@ C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Infrastructure\obj\Debug\net8
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Infrastructure\obj\Debug\net8.0\ref\MiVehiculoAAA.Infrastructure.dll
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Infrastructure\bin\Debug\net8.0\MiVehiculoAAA.Infrastructure.runtimeconfig.json
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Infrastructure\obj\Debug\net8.0\MiVehiculoAAA.Infrastructure.genruntimeconfig.cache
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Infrastructure\obj\Debug\net8.0\MiVehiculoAAA.Infrastructure.sourcelink.json

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../domain/entities/user_role.dart';
 import '../controllers/auth_provider.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -39,7 +40,16 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       return;
     }
 
-    context.go(session == null ? AppRoutes.login : AppRoutes.dashboard);
+    if (session == null) {
+      context.go(AppRoutes.login);
+      return;
+    }
+
+    context.go(
+      session.role == UserRole.administrator
+          ? AppRoutes.adminDashboard
+          : AppRoutes.dashboard,
+    );
   }
 
   @override

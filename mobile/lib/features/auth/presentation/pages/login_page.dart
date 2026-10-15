@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../domain/entities/user_role.dart';
 import '../controllers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -54,7 +55,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
-    context.go(AppRoutes.dashboard);
+    final session = ref.read(authProvider).asData?.value;
+
+    context.go(
+      session?.role == UserRole.administrator
+          ? AppRoutes.adminDashboard
+          : AppRoutes.dashboard,
+    );
   }
 
   @override

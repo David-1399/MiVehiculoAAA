@@ -19,10 +19,12 @@ using MiVehiculoAAA.Application.Common.Settings;
 using MiVehiculoAAA.Application.Features.Auth;
 using MiVehiculoAAA.Application.Features.Catalogos;
 using MiVehiculoAAA.Application.Features.Vehiculos;
+using MiVehiculoAAA.Application.Features.UsuariosAdmin;
 using MiVehiculoAAA.Infrastructure.Auth;
 using MiVehiculoAAA.Infrastructure.Catalogos;
 using MiVehiculoAAA.Infrastructure.Data;
 using MiVehiculoAAA.Infrastructure.Vehiculos;
+using MiVehiculoAAA.Infrastructure.UsuariosAdmin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +101,7 @@ builder.Services.AddScoped<IDocumentoService, DocumentoService>();
 builder.Services.AddScoped<IGastoService, GastoService>();
 builder.Services.AddScoped<IAlertaService, AlertaService>();
 builder.Services.AddScoped<IProximoMantenimientoService, ProximoMantenimientoService>();
+builder.Services.AddScoped<IUsuarioAdminService, UsuarioAdminService>();
 
 builder.Services.AddSwaggerGen(options =>
 {

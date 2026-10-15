@@ -6,6 +6,12 @@ abstract final class AppRoutes {
 
   static const String dashboard = '/dashboard';
 
+  static const String adminDashboard = '/admin';
+  static const String adminUsers = '/admin/users';
+  static const String adminUserRegister = '/admin/users/register';
+  static const String adminUserDetail = '/admin/users/detail';
+  static const String adminUserEdit = '/admin/users/edit';
+
   static const String vehicles = '/vehicles';
   static const String vehicleRegister = '/vehicles/register';
   static const String vehicleDetail = '/vehicles/detail';

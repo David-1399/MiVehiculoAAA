@@ -13,3 +13,4 @@ C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\refint\MiVehiculoAAA.Application.dll
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.pdb
 C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\ref\MiVehiculoAAA.Application.dll
+C:\DESARROLLOS\MiVehiculoAAA\backend\MiVehiculoAAA.Application\obj\Debug\net8.0\MiVehiculoAAA.Application.sourcelink.json
