@@ -4,13 +4,14 @@ La aplicación utiliza PostgreSQL.
 
 ## Orden para crear una instalación nueva
 
-1. Conectarse en PostgreSQL a la base administrativa `postgres`.
-2. Ejecutar `000_crear_base_datos.sql`.
-3. Cambiar la conexión a la base `MiVehiculoAAA`.
-4. Ejecutar `001_schema_inicial.sql`.
-5. Ejecutar `002_gastos_mantenimiento.sql`.
-6. Opcionalmente, después de registrar un usuario desde la aplicación,
-   usar `003_promover_usuario_admin.sql` para convertirlo en administrador.
+1. Conectarse a PostgreSQL en la base postgres.
+2. Ejecutar 000_crear_base_datos.sql.
+3. Cambiar la conexión a la base MiVehiculoAAA.
+4. Ejecutar 001_schema_inicial.sql.
+5. Configurar appsettings.Development.json.
+6. Levantar la API.
+7. Registrar un usuario desde la aplicación.
+8. Opcionalmente ejecutar 003_promover_usuario_admin.sql para convertir un usuario en administrador.
 
 ## Configuración local de la API
 
