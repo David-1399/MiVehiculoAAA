@@ -14,7 +14,6 @@ class UserSession {
   final String? displayName;
   final UserRole role;
 
-  /// Preparado para JWT. En el adaptador local permanece null.
   final String? accessToken;
 
   bool get hasDisplayName {

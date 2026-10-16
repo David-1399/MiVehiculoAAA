@@ -99,7 +99,6 @@ class ApiAuthRepository implements AuthRepository {
         await _apiClient.dio.post<void>('/api/auth/logout');
       }
     } catch (_) {
-      // El logout local debe completarse incluso si la API no responde.
     } finally {
       await _apiClient.tokenStorage.clearToken();
     }

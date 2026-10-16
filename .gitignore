@@ -1,27 +1,93 @@
-﻿# IDE
-.idea/
+﻿# ============================================================
+# MiVehiculoAAA - .gitignore
+# Proyecto Flutter + ASP.NET Core + PostgreSQL
+# ============================================================
 
-# Snapshots / backups / scripts temporales
+# ------------------------------------------------------------
+# IDE / editores
+# ------------------------------------------------------------
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# ------------------------------------------------------------
+# Snapshots, backups y artefactos temporales
+# ------------------------------------------------------------
 _snapshot/
+_revision_codigo/
 backup-*/
 *.zip
+
+# Scripts locales de mantenimiento / cierre
 Crear-Snapshot-MiVehiculoAAA*.ps1
+Generar-Snapshot-Revision-Codigo-MiVehiculoAAA*.ps1
 Fix-Catalogos-MiVehiculoAAA*.ps1
 Refactor-*.ps1
+Limpiar-Codigo-Final-MiVehiculoAAA.ps1
+Preparar-Repositorio-Clonable-MiVehiculoAAA.ps1
+Validar-Proyecto-Final-MiVehiculoAAA.ps1
 
+# ------------------------------------------------------------
 # Flutter / Dart
+# ------------------------------------------------------------
 mobile/.dart_tool/
 mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
 mobile/.idea/
+mobile/coverage/
 
+# ------------------------------------------------------------
 # Android
+# ------------------------------------------------------------
 mobile/android/.gradle/
 mobile/android/local.properties
+mobile/android/key.properties
+*.jks
+*.keystore
 
+# ------------------------------------------------------------
 # iOS
+# ------------------------------------------------------------
 mobile/ios/Pods/
 mobile/ios/.symlinks/
 mobile/ios/Flutter/ephemeral/
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/flutter_export_environment.sh
 
-# Logs
+# ------------------------------------------------------------
+# .NET / ASP.NET Core
+# ------------------------------------------------------------
+**/bin/
+**/obj/
+
+# ------------------------------------------------------------
+# Configuracion local y secretos
+# ------------------------------------------------------------
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/secrets.json
+
+.env
+.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+
+# ------------------------------------------------------------
+# Logs, pruebas y cobertura
+# ------------------------------------------------------------
 *.log
+coverage/
+TestResults/
+
+# ------------------------------------------------------------
+# Sistema operativo
+# ------------------------------------------------------------
+Thumbs.db
+.DS_Store
+Desktop.ini

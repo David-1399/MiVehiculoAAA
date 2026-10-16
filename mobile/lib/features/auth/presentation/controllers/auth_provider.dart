@@ -36,10 +36,6 @@ class AuthNotifier extends AsyncNotifier<UserSession?> {
     state = result;
 
     if (result.hasValue && result.value != null) {
-      // SESSION_SCOPE_RESET_SIGNIN
-      // Primero publicamos la nueva sesión y luego invalidamos los
-      // providers dependientes. Así, al reconstruirse, leen al usuario
-      // recién autenticado y cargan sus datos desde la API.
       _clearSessionScopedState();
     }
 
@@ -79,9 +75,6 @@ class AuthNotifier extends AsyncNotifier<UserSession?> {
 
     state = const AsyncData<UserSession?>(null);
 
-    // SESSION_SCOPE_RESET_SIGNOUT
-    // Primero publicamos que ya no existe sesión y después invalidamos
-    // cualquier estado asociado al usuario anterior.
     _clearSessionScopedState();
   }
 }

@@ -83,12 +83,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Align(
                   alignment: Alignment.center,
                   child: Container(
-                    width: 88,
-                    height: 88,
-                    padding: const EdgeInsets.all(6),
+                    width: 96,
+                    height: 96,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.08),
@@ -98,10 +97,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.asset(
-                        'assets/images/MiVehiculoAAA.jpg',
-                        fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Transform.scale(
+                        scale: 1.35,
+                        child: Image.asset(
+                          'assets/images/MiVehiculoAAA.jpg',
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                          filterQuality: FilterQuality.high,
+                        ),
                       ),
                     ),
                   ),
@@ -235,17 +239,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       child: const Text('Regístrate'),
                     ),
                   ],
-                ),
-
-                const SizedBox(height: 8),
-
-                const Text(
-                  'La autenticación contra servidor se conectará al implementar la API. La contraseña no se guarda localmente.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 11,
-                  ),
                 ),
               ],
             ),

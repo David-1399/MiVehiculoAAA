@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\MiVehiculoAAA.Api.props" />
-</Project>

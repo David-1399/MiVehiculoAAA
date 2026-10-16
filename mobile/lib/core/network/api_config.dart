@@ -1,7 +1,6 @@
 class ApiConfig {
   const ApiConfig._();
 
-  // Android Emulator -> localhost del equipo Windows.
   static const baseUrl = 'http://10.0.2.2:5150';
 
   static const connectTimeout = Duration(seconds: 10);

@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\MiVehiculoAAA.Api.props" />
-</Project>
