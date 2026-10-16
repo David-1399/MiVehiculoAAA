@@ -30,7 +30,7 @@ public class EvidenciasController : ControllerBase
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(MaxFileSize)]
     public async Task<IActionResult> Subir(
-        [FromForm] IFormFile archivo,
+        IFormFile archivo,
         CancellationToken cancellationToken
     )
     {
